@@ -1,0 +1,13 @@
+//to insert mock data,execute these commands
+
+
+insert into room values (01,10,"Chennai"),(02,4,"Tanjore"),(03,6,"Melbourne"),(04,15,"San Fransisco"),(05,50,"Training Room");
+
+insert into teams
+values(101,4,"Spring Training"),(102,3,"React Training"),(103,2,"dotNet Training"),(104,2,"Angular Training"),(1,51,"SE"),(2,78,"IP");
+
+insert into employee values(2001,"maamathi@cdw","maamathi","k"),(2002,"pavithra@cdw","pavithra","g"),(2003,"shakthivel@cdw","shakthivel","k"),(2004,"naveenraja@cdw","naveen","n"),(1001,"varun@cdw","varun","s"),(1002,"prakash@cdw","prakash","r"),(1003,"yagzan@cdw","yagzan","m"),(101,"nijin@cdw","nijin","v")	;
+
+insert into team_employee values(101,2001),(101,2002),(101,2003),(101,2004);
+insert into team_employee values(1,2001),(1,2002),(1,2003),(1,2004),(1,1001),(1,1002),(1,1003),(1,101);
+
