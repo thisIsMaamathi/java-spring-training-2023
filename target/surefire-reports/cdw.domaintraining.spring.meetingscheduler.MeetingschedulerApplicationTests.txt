@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: cdw.domaintraining.spring.meetingscheduler.MeetingschedulerApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.067 s - in cdw.domaintraining.spring.meetingscheduler.MeetingschedulerApplicationTests
