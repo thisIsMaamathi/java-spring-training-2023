@@ -1,12 +1,9 @@
 package cdw.domaintraining.spring.meetingscheduler.responseentity;
 
-import cdw.domaintraining.spring.meetingscheduler.entities.Employee;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
-public class BookForTeamResponse {
+public class BookForColabMeetingResponse {
     int roomId;
     int teamId;
     LocalDate date;
@@ -15,7 +12,7 @@ public class BookForTeamResponse {
     String desc;
 
 
-    public BookForTeamResponse(int roomId, int teamId, LocalDate date, LocalTime start_time, LocalTime end_time, String desc) {
+    public BookForColabMeetingResponse(int roomId, int teamId, LocalDate date, LocalTime start_time, LocalTime end_time, String desc) {
         this.roomId = roomId;
         this.teamId = teamId;
         this.date = date;
@@ -72,6 +69,4 @@ public class BookForTeamResponse {
     public void setDesc(String desc) {
         this.desc = desc;
     }
-
-
 }

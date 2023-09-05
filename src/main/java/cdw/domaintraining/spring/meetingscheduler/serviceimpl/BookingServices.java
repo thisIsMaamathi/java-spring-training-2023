@@ -5,12 +5,15 @@ import cdw.domaintraining.spring.meetingscheduler.entities.Employee;
 import cdw.domaintraining.spring.meetingscheduler.entities.Room;
 import cdw.domaintraining.spring.meetingscheduler.entities.Team;
 import cdw.domaintraining.spring.meetingscheduler.entities.TimeSlot;
+import cdw.domaintraining.spring.meetingscheduler.exceptions.*;
 import cdw.domaintraining.spring.meetingscheduler.repositories.EmployeeRepository;
 import cdw.domaintraining.spring.meetingscheduler.repositories.RoomRepository;
 import cdw.domaintraining.spring.meetingscheduler.repositories.TeamRepository;
 import cdw.domaintraining.spring.meetingscheduler.repositories.TimeSlotRepository;
 import cdw.domaintraining.spring.meetingscheduler.requestentity.TimeSlotRequest;
-import cdw.domaintraining.spring.meetingscheduler.responseentity.*;
+import cdw.domaintraining.spring.meetingscheduler.responseentity.BookForColabMeetingResponse;
+import cdw.domaintraining.spring.meetingscheduler.responseentity.BookForTeamResponse;
+import cdw.domaintraining.spring.meetingscheduler.responseentity.CancelMeetingResponse;
 import cdw.domaintraining.spring.meetingscheduler.serviceinterface.BookingServicesInterface;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -28,6 +31,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+/**
+ * This service defines methods that will allow a user to book or cancel meetings
+ */
 
 @Service
 public class BookingServices implements BookingServicesInterface {
@@ -65,12 +72,12 @@ public class BookingServices implements BookingServicesInterface {
      */
     @Override
     @Transactional
-    public Object bookForTeam(int employeeId, int roomID, TimeSlotRequest request, int teamId, String desc) {
+    public BookForTeamResponse bookForTeam(int employeeId, int roomID, TimeSlotRequest request, int teamId, String desc) throws EmployeeEngagedException, SlotOccupiedException, CapacityMismatchException {
 
         List<Employee> unavailableEmployee = new ArrayList<>();
-        Optional<Team> team = teamRepository.findById(teamId);
-        Optional<Room> room = roomRepository.findById(roomID);
-        Optional<Employee> employee1 = employeeRepository.findById(employeeId);
+        Optional<Team> team = Optional.of(teamRepository.findById(teamId)).orElseThrow();
+        Optional<Room> room = Optional.of(roomRepository.findById(roomID)).orElseThrow();
+        Optional<Employee> employee1 = Optional.of(employeeRepository.findById(employeeId)).orElseThrow();
         int capacity = checkRoomCapacity(room.get(), team.get().getTeamCount());
 
         if (capacity == 1) {
@@ -94,21 +101,21 @@ public class BookingServices implements BookingServicesInterface {
 
                 } else {
                     logger.info("Meeting cannot be booked,returning unavailable employees list");
-                    return new UnavailableEmployeesResponse(unavailableEmployee);
+                    throw new EmployeeEngagedException("Meeting cannot be booked,returning unavailable employees list");
 
                 }
 
 
             } else {
                 logger.info("Slot already occupied");
-                List<TimeSlot> occupiedSlots = timeSlotRepository.findAllByRoomIdAndDate(roomID, request.getDate());
-                return new OccupiedSlotsResponse(occupiedSlots); //occupied slots of the room
+                //List<TimeSlot> occupiedSlots = timeSlotRepository.findAllByRoomIdAndDate(roomID, request.getDate());
+                throw new SlotOccupiedException("Slot already occupied");//occupied slots of the room
             }
 
         } else {
             logger.info("Capacity mismatch");
-            Room nextNearestRoom = nextNearestRoom(team.get().getTeamCount(), room.get(), capacity);
-            return new NextNearestRoomResponse(nextNearestRoom); //next nearest room for the team capacity
+            //Room nextNearestRoom = nextNearestRoom(team.get().getTeamCount(), room.get(), capacity);
+            throw new CapacityMismatchException("Capacity mismatch"); //next nearest room for the team capacity
         }
     }
 
@@ -127,11 +134,11 @@ public class BookingServices implements BookingServicesInterface {
      */
     @Override
     @Transactional
-    public Object bookOutsideTeam(int employeeId, int roomId, TimeSlotRequest request, List<Integer> employeeList, String desc) {
+    public BookForColabMeetingResponse bookOutsideTeam(int employeeId, int roomId, TimeSlotRequest request, List<Integer> employeeList, String desc) throws EmployeeEngagedException, SlotOccupiedException, CapacityMismatchException {
 
-        Optional<Room> room = roomRepository.findById(roomId);
+        Optional<Room> room = Optional.of(roomRepository.findById(roomId)).orElseThrow();
         List<Employee> unavailableEmployees = new ArrayList<>();
-        Optional<Employee> employee1 = employeeRepository.findById(employeeId);
+        Optional<Employee> employee1 = Optional.of(employeeRepository.findById(employeeId)).orElseThrow();
 
         List<Employee> collaborators = employeeList.stream().map(empId -> employeeRepository.findById(empId).orElse(null)).filter(Objects::nonNull).collect(Collectors.toList());
         int capacity = checkRoomCapacity(room.get(), employeeList.size());
@@ -149,26 +156,26 @@ public class BookingServices implements BookingServicesInterface {
                     timeSlot.setEmployee(employee1.get());
                     entityManager.persist(timeSlot);
                     logger.info("booked slot");
-                    return new BookForTeamResponse(timeSlot.getRoomId(), timeSlot.getTeamId(), timeSlot.getDate(), timeSlot.getStart_time(), timeSlot.getEnd_time(), timeSlot.getDesc());
+                    return new BookForColabMeetingResponse(timeSlot.getRoomId(), timeSlot.getTeamId(), timeSlot.getDate(), timeSlot.getStart_time(), timeSlot.getEnd_time(), timeSlot.getDesc());
 
 
                 } else {
                     logger.info("Some employees are engaged");
-                    return new UnavailableEmployeesResponse(unavailableEmployees);
+                    throw new EmployeeEngagedException("Some employees are engaged");
 
                 }
 
             } else {
                 logger.info("Slot already occupied");
-                List<TimeSlot> occupiedSlots = timeSlotRepository.findAllByRoomIdAndDate(roomId, request.getDate());
-                return new OccupiedSlotsResponse(occupiedSlots);
+                //List<TimeSlot> occupiedSlots = timeSlotRepository.findAllByRoomIdAndDate(roomId, request.getDate());
+                throw new SlotOccupiedException("Slot already occupied");
 
             }
 
         } else {
             logger.info("Capacity mismatch");
-            Room nextNearestRoom = nextNearestRoom(employeeList.size(), room.get(), capacity);
-            return new NextNearestRoomResponse(nextNearestRoom);
+            // Room nextNearestRoom = nextNearestRoom(employeeList.size(), room.get(), capacity);
+            throw new CapacityMismatchException("Capacity mismatch");
         }
     }
 
@@ -295,9 +302,9 @@ public class BookingServices implements BookingServicesInterface {
      */
 
     @Override
-    public CancelMeetingResponse cancelMeeting(int timeSlotId) {
+    public CancelMeetingResponse cancelMeeting(int timeSlotId) throws MeetingFinishedException, NoMeetingScheduledException {
 
-        Optional<TimeSlot> timeSlot = timeSlotRepository.findById(timeSlotId);
+        Optional<TimeSlot> timeSlot = Optional.of(timeSlotRepository.findById(timeSlotId)).orElseThrow();
         if (timeSlot.isPresent()) {
             if (LocalDate.now().isBefore(timeSlot.get().getDate()) || LocalDate.now().isEqual(timeSlot.get().getDate())) {
                 long difference = ChronoUnit.MINUTES.between(LocalTime.now(), timeSlot.get().getStart_time());
@@ -313,12 +320,12 @@ public class BookingServices implements BookingServicesInterface {
 
             } else {
                 logger.info("Meeting already got over....");
-                return new CancelMeetingResponse("Meeting already got over");
+                throw new MeetingFinishedException("Meeting already got over");
 
             }
         } else {
             logger.info("No such meeting exists");
-            return new CancelMeetingResponse("No such meeting exists");
+            throw new NoMeetingScheduledException("No such meeting exists");
 
         }
 

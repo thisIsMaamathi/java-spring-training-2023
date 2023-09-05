@@ -3,11 +3,15 @@ package cdw.domaintraining.spring.meetingscheduler.serviceimpl;
 import cdw.domaintraining.spring.meetingscheduler.MeetingschedulerApplication;
 import cdw.domaintraining.spring.meetingscheduler.entities.Room;
 import cdw.domaintraining.spring.meetingscheduler.entities.TimeSlot;
+import cdw.domaintraining.spring.meetingscheduler.exceptions.NoSuchRoomFoundException;
+import cdw.domaintraining.spring.meetingscheduler.exceptions.NoSuchTimeSlotException;
 import cdw.domaintraining.spring.meetingscheduler.repositories.EmployeeRepository;
 import cdw.domaintraining.spring.meetingscheduler.repositories.RoomRepository;
 import cdw.domaintraining.spring.meetingscheduler.repositories.TeamRepository;
 import cdw.domaintraining.spring.meetingscheduler.repositories.TimeSlotRepository;
 import cdw.domaintraining.spring.meetingscheduler.requestentity.TimeSlotRequest;
+import cdw.domaintraining.spring.meetingscheduler.exceptions.NoMeetingScheduledException;
+import cdw.domaintraining.spring.meetingscheduler.responseentity.TimeSlotResponse;
 import cdw.domaintraining.spring.meetingscheduler.responseentity.ViewMeetingsResponse;
 import cdw.domaintraining.spring.meetingscheduler.serviceinterface.ViewServiceInterface;
 import jakarta.persistence.EntityManager;
@@ -21,6 +25,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This service provides methods to mettings according to requirement
+ */
 @Service
 public class ViewServices implements ViewServiceInterface {
     private static final Logger logger = LogManager.getLogger(MeetingschedulerApplication.class);
@@ -47,14 +54,15 @@ public class ViewServices implements ViewServiceInterface {
 
     /**
      * Method to retrieve timeslot id from timeslotRequest given
+     *
      * @param request
      * @param roomId
      * @return returns timeslot id for the given request
      */
 
     @Override
-    public ViewMeetingsResponse findTimeSlotId(TimeSlotRequest request, int roomId) {
-        Optional<Room> room = roomRepository.findById(roomId);
+    public TimeSlotResponse findTimeSlotId(TimeSlotRequest request, int roomId) throws NoSuchTimeSlotException, NoSuchRoomFoundException {
+        Optional<Room> room = Optional.of(roomRepository.findById(roomId)).orElseThrow();
 
 
         if (room.isPresent()) {
@@ -65,16 +73,16 @@ public class ViewServices implements ViewServiceInterface {
 
             if (matchingSlot.isPresent()) {
                 logger.info("the meeting id is" + matchingSlot.get().getTimeSlotId());
-                return new ViewMeetingsResponse(matchingSlot.get());
+                return new TimeSlotResponse(matchingSlot.get());
 
             } else {
                 logger.info("No timeslot exists");
-                return new ViewMeetingsResponse("No such timeslot exists");
+               throw new NoSuchTimeSlotException("No timeslot exists");
             }
 
         } else {
             logger.info("Room not found");
-            return new ViewMeetingsResponse("Room not found");
+            throw new NoSuchRoomFoundException("Room not found");
         }
     }
 
@@ -83,7 +91,7 @@ public class ViewServices implements ViewServiceInterface {
      * @return a list of meetings
      */
     @Override
-    public ViewMeetingsResponse findAllMeetings() {
+    public ViewMeetingsResponse findAllMeetings() throws Exception {
 
         List<TimeSlot> meetings = timeSlotRepository.findAll();
 
@@ -92,7 +100,7 @@ public class ViewServices implements ViewServiceInterface {
             return new ViewMeetingsResponse(meetings);
         } else {
             logger.info("No meetings scheduled ");
-            return new ViewMeetingsResponse("There are no meetings scheduled");
+            throw new Exception("No Meetings Scheduled");
 
         }
     }
@@ -103,16 +111,17 @@ public class ViewServices implements ViewServiceInterface {
      * @return list of meetings scheduled on that date
      */
     @Override
-    public ViewMeetingsResponse findAllMeetingsByDate(LocalDate date) {
+    public ViewMeetingsResponse findAllMeetingsByDate(LocalDate date) throws NoMeetingScheduledException {
 
         List<TimeSlot> meetings = timeSlotRepository.findAllByDate(date);
 
         if (!meetings.isEmpty()) {
             logger.info("Returning all meetings");
             return new ViewMeetingsResponse(meetings);
+
         } else {
             logger.info("No meetings scheduled ");
-            return new ViewMeetingsResponse("There are no meetings scheduled");
+            throw new NoMeetingScheduledException("No meetings scheduled");
 
         }
     }
@@ -123,7 +132,7 @@ public class ViewServices implements ViewServiceInterface {
      * @return a  list of rooms
      */
     @Override
-    public ViewMeetingsResponse findAllMeetingsByRoom (int roomId){
+    public ViewMeetingsResponse findAllMeetingsByRoom (int roomId) throws NoMeetingScheduledException {
         List<TimeSlot> meetings=timeSlotRepository.findAllByRoomId(roomId);
 
         if (!meetings.isEmpty()) {
@@ -131,7 +140,7 @@ public class ViewServices implements ViewServiceInterface {
             return new ViewMeetingsResponse(meetings);
         } else {
             logger.info("No meetings scheduled ");
-            return new ViewMeetingsResponse("There are no meetings scheduled");
+           throw new NoMeetingScheduledException("No meetings scheduled ");
         }
     }
 

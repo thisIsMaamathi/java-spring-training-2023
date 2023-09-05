@@ -1,15 +1,12 @@
 package cdw.domaintraining.spring.meetingscheduler.responseentity;
 
 import cdw.domaintraining.spring.meetingscheduler.entities.TimeSlot;
-import cdw.domaintraining.spring.meetingscheduler.serviceimpl.UpdatingService;
 
-public class UpdateMeetingResponse {
+public class TimeSlotResponse {
     TimeSlot timeSlot;
-    String message;
 
-    public UpdateMeetingResponse(TimeSlot timeSlot, String message) {
+    public TimeSlotResponse(TimeSlot timeSlot) {
         this.timeSlot = timeSlot;
-        this.message = message;
     }
 
     public TimeSlot getTimeSlot() {

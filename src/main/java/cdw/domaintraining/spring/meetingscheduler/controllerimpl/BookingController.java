@@ -1,47 +1,73 @@
 package cdw.domaintraining.spring.meetingscheduler.controllerimpl;
 
 import cdw.domaintraining.spring.meetingscheduler.controllerinterface.BookingControllerInterface;
+import cdw.domaintraining.spring.meetingscheduler.exceptions.*;
 import cdw.domaintraining.spring.meetingscheduler.requestentity.BookColabMeetingRequest;
 import cdw.domaintraining.spring.meetingscheduler.requestentity.BookTeamMeetingRequest;
 import cdw.domaintraining.spring.meetingscheduler.requestentity.TimeSlotRequest;
+import cdw.domaintraining.spring.meetingscheduler.responseentity.BookForColabMeetingResponse;
+import cdw.domaintraining.spring.meetingscheduler.responseentity.BookForTeamResponse;
+import cdw.domaintraining.spring.meetingscheduler.responseentity.CancelMeetingResponse;
 import cdw.domaintraining.spring.meetingscheduler.serviceimpl.BookingServices;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+/**
+ * A Controller that handles requests for booking and cancelling the meetings.
+ */
 
 @RestController
 @RequestMapping("/meeting")
 public class BookingController implements BookingControllerInterface {
     BookingServices bookingServices;
     @Autowired
-   public BookingController(BookingServices bookingServices){
+    public BookingController(BookingServices bookingServices){
        this.bookingServices=bookingServices;
 
    }
 
+    /**
+     * Method that allows the user to book a meeting for an existing team
+     * @param request
+     * @return Response entity that contains details about booked slot
+     * @throws EmployeeEngagedException
+     * @throws SlotOccupiedException
+     * @throws CapacityMismatchException
+     */
    @PostMapping("/team")
-    public ResponseEntity<Object> bookMeetingForTeam(@RequestBody BookTeamMeetingRequest request)  {
+    public ResponseEntity<BookForTeamResponse> bookMeetingForTeam(@RequestBody BookTeamMeetingRequest request) throws EmployeeEngagedException, SlotOccupiedException, CapacityMismatchException {
         TimeSlotRequest timeSlotRequest=new TimeSlotRequest(request.getDate(),request.getStart_time(),request.getEnd_time());
-        Object object=bookingServices.bookForTeam(request.getEmployeeId(), request.getRoomId(),timeSlotRequest, request.getTeamId(), request.getDesc());
-        return ResponseEntity.status(HttpStatus.OK).body(object);
+        return ResponseEntity.status(HttpStatus.OK).body(bookingServices.bookForTeam(request.getEmployeeId(), request.getRoomId(),timeSlotRequest, request.getTeamId(), request.getDesc()));
+
    }
 
+    /**
+     * Method that allows the user to book meeting for a colab team
+     * @param request
+     * @return response entity that contains details about slot
+     * @throws EmployeeEngagedException
+     * @throws SlotOccupiedException
+     * @throws CapacityMismatchException
+     */
     @PostMapping("/colab")
-    public ResponseEntity<Object> bookMeetingForCollab(@RequestBody BookColabMeetingRequest request){
+    public ResponseEntity<BookForColabMeetingResponse> bookMeetingForCollab(@RequestBody BookColabMeetingRequest request) throws EmployeeEngagedException, SlotOccupiedException, CapacityMismatchException {
         TimeSlotRequest timeSlotRequest=new TimeSlotRequest(request.getDate(),request.getStart_time(),request.getEnd_time());
-        Object object=bookingServices.bookOutsideTeam(request.getEmployeeId(), request.getRoomId(),timeSlotRequest,request.getCollaborators(), request.getDesc());
-        return ResponseEntity.ok(object);
+        return ResponseEntity.ok(bookingServices.bookOutsideTeam(request.getEmployeeId(), request.getRoomId(),timeSlotRequest,request.getCollaborators(), request.getDesc()));
     }
 
+    /**
+     * Method that allow the user to cancel the meeting
+     * @param timeslotId
+     * @return Cancel Meeting response
+     * @throws NoMeetingScheduledException
+     * @throws MeetingFinishedException
+     */
+
     @DeleteMapping("/{timeslotId}")
-    public ResponseEntity<Object> cancelmeet(@PathVariable int timeslotId){
-        Object object=bookingServices.cancelMeeting(timeslotId);
-        return ResponseEntity.ok(object);
+    public ResponseEntity<CancelMeetingResponse> cancelmeet(@PathVariable int timeslotId) throws NoMeetingScheduledException, MeetingFinishedException {
+        return ResponseEntity.ok(bookingServices.cancelMeeting(timeslotId));
     }
 
 

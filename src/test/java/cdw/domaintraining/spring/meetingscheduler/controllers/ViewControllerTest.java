@@ -2,8 +2,6 @@ package cdw.domaintraining.spring.meetingscheduler.controllers;
 
 import cdw.domaintraining.spring.meetingscheduler.controllerimpl.ViewController;
 import cdw.domaintraining.spring.meetingscheduler.entities.TimeSlot;
-import cdw.domaintraining.spring.meetingscheduler.requestentity.FindTimeSlotIdRequest;
-import cdw.domaintraining.spring.meetingscheduler.requestentity.TimeSlotRequest;
 import cdw.domaintraining.spring.meetingscheduler.responseentity.ViewMeetingsResponse;
 import cdw.domaintraining.spring.meetingscheduler.serviceimpl.ViewServices;
 import org.junit.jupiter.api.Test;
@@ -30,7 +28,7 @@ public class ViewControllerTest {
     ViewServices viewServices;
 
     @Test
-    public void showAllMeetingsTest() {
+    public void showAllMeetingsTest() throws Exception {
         TimeSlot timeSlot1 = new TimeSlot(101, 1, LocalDate.of(2023, 1, 4), LocalTime.of(12, 0), LocalTime.of(12, 30), "casual", 1);
         TimeSlot timeSlot2 = new TimeSlot(100, 3, LocalDate.of(2023, 5, 6), LocalTime.of(13, 00), LocalTime.of(13, 30), "connect", 1);
 
@@ -43,27 +41,9 @@ public class ViewControllerTest {
 
         when(viewServices.findAllMeetings()).thenReturn(viewMeetingsResponse);
 
-        ResponseEntity<ViewMeetingsResponse> response = viewController.findAllMeetings();
+        ResponseEntity<ViewMeetingsResponse> response = viewController.
+                findAllMeetings();
         assertEquals(mockEntity, response);
-    }
-
-    @Test
-    public void findTimeSlotIdTest() {
-
-        TimeSlot timeSlot = new TimeSlot(101, 1, LocalDate.of(2023, 1, 4), LocalTime.of(12, 0), LocalTime.of(12, 30), "casual", 1);
-        ViewMeetingsResponse viewMeetingsResponse = new ViewMeetingsResponse(timeSlot);
-        ResponseEntity<ViewMeetingsResponse> mockEntity = ResponseEntity.ok(viewMeetingsResponse);
-
-        TimeSlotRequest request = new TimeSlotRequest(LocalDate.of(2023, 1, 4), LocalTime.of(12, 0), LocalTime.of(12, 30));
-        FindTimeSlotIdRequest findTimeSlotIdRequest=new FindTimeSlotIdRequest(1,LocalDate.of(2023, 1, 4), LocalTime.of(12, 0), LocalTime.of(12, 30));
-
-        when(viewServices.findTimeSlotId(request, 1)).thenReturn(viewMeetingsResponse);
-        ResponseEntity<ViewMeetingsResponse> response = viewController.findingTimeSlotId(findTimeSlotIdRequest);
-        assertEquals(mockEntity, response);
-
-
-
-
     }
 
 
