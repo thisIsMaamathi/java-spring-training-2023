@@ -17,4 +17,23 @@ public class DemoController {
         return "login";
     }
 
+
+    @GetMapping("/leaders")
+    public String showLeadersPage() {
+        return "leaders";
+
+    }
+
+    @GetMapping("/systems")
+    public String showsystemsPage() {
+        return "systems";
+
+    }
+
+    @GetMapping("/access-denied")
+    public String showaccessDeniedPage() {
+        return "denied";
+
+    }
+
 }

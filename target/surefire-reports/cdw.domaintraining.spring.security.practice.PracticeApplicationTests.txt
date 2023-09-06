@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: cdw.domaintraining.spring.security.practice.PracticeApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.097 s - in cdw.domaintraining.spring.security.practice.PracticeApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.738 s - in cdw.domaintraining.spring.security.practice.PracticeApplicationTests
