@@ -1,0 +1,23 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org">
+<h1 > Hello </h1>
+
+<div>
+    User   : <span sec:authentication="principal.username"></span>
+    Role  : <span sec:authentication="principal.authorities"></span>
+</div>
+
+<div>
+    <div sec:authorize="hasRole('MANAGER')">
+    <a th:href="@{/leaders}">Leaders Page</a>
+    <div>
+    <br> <br>
+        <div sec:authorize="hasRole('ADMIN')">
+    <a th:href="@{/systems}">Systems </a>
+            </div>
+</div>
+
+<form action="#" th:action="@{/logout}" method="POST">
+    <input type="submit" value="Logout">
+
+</form>
+</html>
