@@ -1,13 +1,13 @@
-package cdw.springtraining.showbookingsystem;
+package cdw.springtraining.moviebooking;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ShowbookingsystemApplication {
+public class MoviebookingApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ShowbookingsystemApplication.class, args);
+		SpringApplication.run(MoviebookingApplication.class, args);
 	}
 
 }

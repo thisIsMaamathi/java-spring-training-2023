@@ -1,10 +1,10 @@
-package cdw.springtraining.showbookingsystem;
+package cdw.springtraining.moviebooking;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ShowbookingsystemApplicationTests {
+class MoviebookingApplicationTests {
 
 	@Test
 	void contextLoads() {
