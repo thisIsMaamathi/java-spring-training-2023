@@ -1,5 +1,7 @@
 package cdw.springtraining.moviebooking.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name="shows")
+@Table(name = "shows")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,34 +20,29 @@ import java.util.List;
 public class Show {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="show_id")
+    @Column(name = "show_id")
     private int show_id;
 
-    @Column(name="slot")
+    @Column(name = "slot")
     private int slot;
 
     @Column(name = "count")
     private int count;
+    @JsonIgnore
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "movie")
+    private Movie movie;
+    @JsonIgnore
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @JoinColumn(name = "location")
+    private Location location;
 
-    
-    @ManyToMany(cascade ={CascadeType.MERGE,CascadeType.PERSIST})
-    @JoinTable(name = "shows_movie",
-            joinColumns = @JoinColumn(name = "show_id"),
-            inverseJoinColumns = @JoinColumn(name = "movie_id"))
-    private List<Movie> moviesList=new ArrayList<>();
-
-    @ManyToMany(cascade ={CascadeType.MERGE,CascadeType.PERSIST})
-    @JoinTable(name = "shows_location",
-            joinColumns = @JoinColumn(name = "show_id"),
-            inverseJoinColumns = @JoinColumn(name = "location_id"))
-    private List<Location> locationList=new ArrayList<>();
-
-
-    @ManyToMany(cascade ={CascadeType.MERGE,CascadeType.PERSIST})
+    @JsonManagedReference
+    @ManyToMany(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinTable(name = "tickets",
             joinColumns = @JoinColumn(name = "show_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> ticketsList=new ArrayList<>();
+    private List<User> ticketsList = new ArrayList<>();
 
 
 

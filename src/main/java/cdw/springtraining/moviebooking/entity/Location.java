@@ -1,5 +1,6 @@
 package cdw.springtraining.moviebooking.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,7 +30,16 @@ public class Location {
     @Column(name="isActive")
     private boolean isActive;
 
+    @Column(name="isPrime")
+    private boolean isPrime;
 
-    @ManyToMany(mappedBy = "locationList",cascade ={CascadeType.MERGE,CascadeType.PERSIST})
+    public Location(String name, String state, boolean isPrime) {
+
+        this.name = name;
+        this.state = state;
+        this.isPrime = isPrime;
+    }
+    @JsonIgnore
+    @OneToMany(mappedBy = "location",cascade ={CascadeType.MERGE,CascadeType.PERSIST})
     private List<Show> regionalShowsList=new ArrayList<>();
 }

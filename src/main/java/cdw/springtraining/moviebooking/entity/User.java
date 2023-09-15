@@ -1,5 +1,7 @@
 package cdw.springtraining.moviebooking.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,13 +42,13 @@ public class User {
 
     @Column(name="password")
     private String password;
-
+    @JsonManagedReference
     @ManyToMany(cascade ={CascadeType.MERGE,CascadeType.PERSIST})
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private List<Role> roleList=new ArrayList<>();
-
+    @JsonBackReference
     @ManyToMany(mappedBy = "ticketsList",cascade ={CascadeType.MERGE,CascadeType.PERSIST})
     private List<Show> bookedShows=new ArrayList<>();
 

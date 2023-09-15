@@ -1,5 +1,6 @@
 package cdw.springtraining.moviebooking.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,8 +26,8 @@ public class Movie {
 
     @Column(name="description")
     private String description;
-
-    @ManyToMany(mappedBy = "moviesList",cascade ={CascadeType.MERGE,CascadeType.PERSIST})
+    @JsonIgnore
+    @OneToMany(mappedBy = "movie",cascade ={CascadeType.MERGE,CascadeType.PERSIST})
     private List<Show> movieShowsList=new ArrayList<>();
 
 }
