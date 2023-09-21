@@ -59,5 +59,4 @@ public class User {
     @ManyToMany(mappedBy = "ticketsList", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     private List<Show> bookedShows = new ArrayList<>();
 
-   private List<Object> cart=new ArrayList<>();
 }

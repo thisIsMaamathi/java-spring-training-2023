@@ -41,4 +41,7 @@ public class AuthenticationService {
 
     }
 
+    public String logoutUser() {
+        return "logout to be implemented";
+    }
 }

@@ -71,13 +71,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf-> csrf.disable())
         .authorizeHttpRequests((authorize) -> {
-//            authorize.requestMatchers("auth/**").permitAll();
-//            authorize.requestMatchers("bu/**").hasAuthority("BUSINESS_USER");
-//            authorize.requestMatchers("admin/**").hasAuthority("ADMIN");
-//            authorize.requestMatchers("user/**").hasAnyAuthority("BUSINESS_USER","END_USER","ADMIN");
-//
-//            authorize.anyRequest().authenticated();
-            authorize.anyRequest().permitAll();
+            authorize.requestMatchers("auth/**").permitAll();
+            authorize.requestMatchers("bu/**").hasAuthority("BUSINESS_USER");
+            authorize.requestMatchers("admin/**").hasAuthority("ADMIN");
+            authorize.requestMatchers("user/**").hasAnyAuthority("BUSINESS_USER","END_USER","ADMIN");
+
+            authorize.anyRequest().authenticated();
+            //authorize.anyRequest().permitAll();
         });
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

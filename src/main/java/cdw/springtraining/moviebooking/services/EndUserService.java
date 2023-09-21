@@ -115,15 +115,10 @@ public class EndUserService {
 
         int ticketsAvailable = show.getCount()-show.getTicketsList().size();
         if (ticketsAvailable>0) {
-//            if(user.getCart()==null)
-//            { List<Object> cart=new ArrayList<>();
-//            user.setCart(cart);}
 //
-//            user.getCart().add(show);
 
             ticketsAvailable--;
-          userRepository.save(user);
-            cartResponse=new CartResponse(user.getUserId(), user.getUserName(),ticketsAvailable,user.getCart());
+            cartResponse=new CartResponse(user.getUserId(), user.getUserName(),ticketsAvailable,show.getShow_id());
         }
         else throw new CapacityFullException("Capacity full");
         return cartResponse;

@@ -19,7 +19,7 @@ public class CartResponse {
     int userId;
    String userName;
    int ticketsAvailable;
-   List<Object> shows=new ArrayList<>();
+  int showId;
 
 
 }

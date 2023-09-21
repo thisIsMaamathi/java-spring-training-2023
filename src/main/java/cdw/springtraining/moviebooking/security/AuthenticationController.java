@@ -27,8 +27,8 @@ public class AuthenticationController {
 
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<String> summaTesting(){
-        return ResponseEntity.ok("Work aagiruch parama");
-    }
+   @PostMapping("/logout")
+    public ResponseEntity<String>logout(){
+        return ResponseEntity.ok(authenticationService.logoutUser());
+   }
 }
