@@ -26,7 +26,8 @@ public class Role {
 
     @Column(name="role_name")
     private String roleName;
+
     @JsonBackReference
-    @ManyToMany(mappedBy = "roleList",cascade ={CascadeType.MERGE,CascadeType.PERSIST})
+    @ManyToMany(mappedBy = "roleList",cascade ={CascadeType.MERGE,CascadeType.PERSIST},fetch = FetchType.EAGER)
     private List<User> usersList=new ArrayList<>();
 }

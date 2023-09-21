@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,9 @@ public class Show {
     @Column(name = "slot")
     private int slot;
 
+    @Column(name="date")
+    private LocalDate date;
+
     @Column(name = "count")
     private int count;
     @JsonIgnore
@@ -43,6 +47,9 @@ public class Show {
             joinColumns = @JoinColumn(name = "show_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> ticketsList = new ArrayList<>();
+
+
+
 
 
 

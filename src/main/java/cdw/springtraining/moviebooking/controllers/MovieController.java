@@ -1,7 +1,7 @@
 package cdw.springtraining.moviebooking.controllers;
 
 import cdw.springtraining.moviebooking.entity.Movie;
-import cdw.springtraining.moviebooking.requestbody.AddMovieRequest;
+import cdw.springtraining.moviebooking.requestbody.MovieRequest;
 import cdw.springtraining.moviebooking.responseobjects.MovieResponse;
 import cdw.springtraining.moviebooking.services.MovieServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +21,7 @@ public class MovieController {
 
     //crud operations
     @PostMapping("/")
-    public ResponseEntity<MovieResponse> addAMovie(@RequestBody AddMovieRequest request){
+    public ResponseEntity<MovieResponse> addAMovie(@RequestBody MovieRequest request){
         return ResponseEntity.ok(movieServices.addMovie(request));
     }
 
@@ -38,6 +38,11 @@ public class MovieController {
     @DeleteMapping("/{movie_id}")
     public ResponseEntity<String> deleteMovie(@PathVariable int movie_id){
         return ResponseEntity.ok(movieServices.removeMovie(movie_id));
+    }
+
+    @PutMapping("/{movie_id}")
+    public ResponseEntity<MovieResponse> updateMovie(@PathVariable int movie_id, @RequestBody MovieRequest request){
+        return ResponseEntity.ok(movieServices.editMovie(movie_id,request));
     }
 
 

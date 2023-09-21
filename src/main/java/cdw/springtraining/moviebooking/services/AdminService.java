@@ -25,4 +25,11 @@ public class AdminService {
         locationRepository.deleteById(locationId);
         return "Deleted";
     }
+
+    public String showHome() {
+
+        return "Home page here";
+    }
+
+
 }

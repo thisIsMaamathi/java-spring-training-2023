@@ -11,10 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MovieResponse {
+
     private String movieName;
     private String description;
 
     public MovieResponse(Movie movie){
+
         this.movieName=movie.getMovieName();
         this.description=movie.getDescription();
     }

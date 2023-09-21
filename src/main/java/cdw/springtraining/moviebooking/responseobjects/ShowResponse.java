@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.http.HttpStatusCode;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,6 +17,7 @@ public class ShowResponse{
 
     private int slot;
     private int count;
+    private LocalDate date;
     private String movieName;
     private String location;
 

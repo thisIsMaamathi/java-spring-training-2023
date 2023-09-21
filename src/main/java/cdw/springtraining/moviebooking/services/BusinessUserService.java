@@ -3,12 +3,15 @@ package cdw.springtraining.moviebooking.services;
 import cdw.springtraining.moviebooking.entity.CancellationRequest;
 import cdw.springtraining.moviebooking.entity.Show;
 import cdw.springtraining.moviebooking.entity.User;
+import cdw.springtraining.moviebooking.exception.CapacityFullException;
+import cdw.springtraining.moviebooking.exception.ElementNotFoundException;
 import cdw.springtraining.moviebooking.repository.CancelRequestsRepository;
 import cdw.springtraining.moviebooking.repository.ShowRepository;
 import cdw.springtraining.moviebooking.repository.UserRepository;
-import cdw.springtraining.moviebooking.requestbody.BookingRequest;
+import cdw.springtraining.moviebooking.requestbody.TicketRequest;
 import cdw.springtraining.moviebooking.requestbody.CancellationRequestBody;
 import cdw.springtraining.moviebooking.responseobjects.BookedShowResponse;
+import cdw.springtraining.moviebooking.responseobjects.ShowResponse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.apache.logging.log4j.LogManager;
@@ -37,33 +40,67 @@ public class BusinessUserService {
         this.cancelRequestsRepository = cancelRequestsRepository;
     }
 
-    public BookedShowResponse bookForSomeone(BookingRequest request) {
-        Optional<Show> show = showRepository.findById(request.getShowId());
-        Optional<User> user = userRepository.findById(request.getUserId());
+    public BookedShowResponse bookForSomeone(TicketRequest request) throws Exception {
+        Optional<Show> optionalShow = showRepository.findById(request.getShowId());
+        Optional<User> optionalUser = userRepository.findById(request.getUserId());
 
-        show.get().getTicketsList().add(user.get());
-        showRepository.save(show.get());
-        logger.info("Booked ticket");
-        BookedShowResponse response = new BookedShowResponse(show.get().getShow_id(), show.get().getSlot(), show.get().getMovie().getMovieName(), show.get().getLocation().getName(),
-                user.get().getUserName());
-        return response;
+         Show show=optionalShow.orElseThrow(()-> new ElementNotFoundException("Show is not present"));
+         User user=optionalUser.orElseThrow(()->new ElementNotFoundException("User doesnot exist"));
+
+         if(show.getCount()>show.getTicketsList().size()) {
+
+             show.getTicketsList().add(user);
+             showRepository.save(show);
+             logger.info("Booked ticket");
+             logger.info("test show name", show.getLocation() + "  " + show.getMovie());
+             BookedShowResponse response = new BookedShowResponse(show.getShow_id(), show.getSlot(), show.getMovie().getMovieName(), show.getLocation().getName(),
+                     user.getUserName());
+             return response;
+
+         }
+         else throw new CapacityFullException("Show is full");
+
 
     }
 
 
     public List<CancellationRequest> viewCancellation() {
+        logger.info("Returning all cancellation requests");
         return cancelRequestsRepository.findAll();
 
     }
 
     public String cancelRequest(CancellationRequestBody requestBody) {
-        Optional<Show> show = showRepository.findById(requestBody.getUserId());
-        Optional<User> user = userRepository.findById(requestBody.getShowId());
+        Optional<Show> optionalShow = showRepository.findById(requestBody.getUserId());
+        Optional<User> optionalUser = userRepository.findById(requestBody.getShowId());
 
-        user.get().getBookedShows().remove(show.get());
-        show.get().getTicketsList().remove(user.get());
-        showRepository.save(show.get());
+        Show show=optionalShow.orElseThrow(()-> new ElementNotFoundException("Show not found"));
+        User user=optionalUser.orElseThrow(()-> new ElementNotFoundException("User not found"));
+
+        user.getBookedShows().remove(show);
+        show.getTicketsList().remove(user);
+        showRepository.save(show);
+        logger.info("cancelling the ticket");
         return "cancelled your booking";
+
+    }
+    public String cancelShow(int showId) {
+        Optional<Show> optionalShow=showRepository.findById(showId);
+
+        Show show=optionalShow.orElseThrow(()-> new ElementNotFoundException("Show not found"));
+        showRepository.delete(show);
+        logger.info("Deleted the show");
+       return "deleted you show";
+
+
+    }
+
+
+    public List<ShowResponse> viewBookingsByAUser(int userId) {
+        Optional<User> optionaluser = userRepository.findById(userId);
+        User user=optionaluser.orElseThrow(()->new ElementNotFoundException("User not found"));
+
+        return user.getBookedShows().stream().map(show -> new ShowResponse(show.getSlot(),show.getCount(),show.getDate(),show.getMovie().getMovieName(),show.getLocation().getName())).toList();
 
     }
 

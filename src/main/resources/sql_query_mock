@@ -1,0 +1,13 @@
+use movie_booking;
+insert into user values
+("2001-06-25",1,"female","mathi@cdw","pas1234","mathi.krish"),("2001-04-07",2,"female","pavi@cdw","pas1234","pavi.govind"),("2000-09-05",3,"male","naveenr@cdw","pas1234","naveen.raja"),("2001-04-05",4,"male","shakthi@cdw","pas1234","shakthi.kannan"), ("1992-04-05",5,"male","yagzan@cdw","snrpas1234","yagzan.nath"),("1998-10-11",6,"male","varun@cdw","snrpas1234","varun.mani"),("1999-04-07",7,"male","prakash@cdw","snrpas1234","prakash.ramesh"),("2000-09-05",8,"male","naveenk@cdw","snrpas1234","naveen.kumar"),
+("1990-04-05",9,"male","nijin@cdw","mngrpas1234","nijin.vinodan");
+
+insert into roles values(1,"ADMIN"),(2,"BUSINESS_USER"),(3,"END_USER");
+
+insert into user_roles values(3,1),(3,2),(3,3),(3,4),(2,5),(2,6),(2,7),(2,8),(1,9);
+insert into locations values
+(false,false,1,"Huntsville","Georgia"),(false,false,2,"Lorain","Hawaii"),(false,false,3,"Brentwood","Michigan"),(false,false,4,"Miami Gardens","Montana");
+
+insert into locations values
+(false,true,5,"Bakersfield","Indiana"),(false,true,6,"Rockwall","Arkansas");
