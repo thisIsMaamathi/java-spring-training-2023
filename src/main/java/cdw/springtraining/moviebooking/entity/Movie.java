@@ -27,7 +27,7 @@ public class Movie {
     @Column(name="description")
     private String description;
     @JsonIgnore
-    @OneToMany(mappedBy = "movie",cascade ={CascadeType.MERGE,CascadeType.PERSIST})
+    @OneToMany(mappedBy = "movie",cascade ={CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REMOVE})
     private List<Show> movieShowsList=new ArrayList<>();
 
 }

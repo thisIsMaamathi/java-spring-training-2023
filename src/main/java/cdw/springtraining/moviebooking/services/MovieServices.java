@@ -2,7 +2,6 @@ package cdw.springtraining.moviebooking.services;
 
 import cdw.springtraining.moviebooking.entity.Movie;
 import cdw.springtraining.moviebooking.exception.ElementNotFoundException;
-
 import cdw.springtraining.moviebooking.repository.MovieRepository;
 import cdw.springtraining.moviebooking.requestbody.MovieRequest;
 import cdw.springtraining.moviebooking.responseobjects.MovieResponse;
@@ -10,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,29 +47,30 @@ public class MovieServices {
     }
 
     public String removeMovie(int movieId) {
-        movieRepository.deleteById(movieId);
-        return "Deleted Movie";
+        if (movieRepository.existsById(movieId)) {
+            movieRepository.deleteById(movieId);
+            return "Deleted Movie";
+        } else throw new ElementNotFoundException("No such movie found");
     }
 
-    public MovieResponse editMovie(int movieId,MovieRequest request) {
+    public MovieResponse editMovie(int movieId, MovieRequest request) {
 
-        Optional<Movie> optionalMovie=movieRepository.findById(movieId);
+        Optional<Movie> optionalMovie = movieRepository.findById(movieId);
         MovieResponse response;
 
-        if(optionalMovie.isPresent()){
-            Movie movie=optionalMovie.get();
+        if (optionalMovie.isPresent()) {
+            Movie movie = optionalMovie.get();
 
-            if(request.getMovieName()!=null){
+            if (request.getMovieName() != null) {
                 movie.setMovieName(request.getMovieName());
             }
 
-            if(request.getDescription()!=null){
+            if (request.getDescription() != null) {
                 movie.setDescription(request.getDescription());
             }
             movieRepository.save(movie);
-            response=new MovieResponse(movie.getMovieName(),movie.getDescription());
-        }
-        else throw new ElementNotFoundException("Movie Not found");
+            response = new MovieResponse(movie.getMovieName(), movie.getDescription());
+        } else throw new ElementNotFoundException("Movie Not found");
 
         return response;
     }

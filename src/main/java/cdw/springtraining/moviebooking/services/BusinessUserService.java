@@ -71,8 +71,8 @@ public class BusinessUserService {
     }
 
     public String cancelRequest(CancellationRequestBody requestBody) {
-        Optional<Show> optionalShow = showRepository.findById(requestBody.getUserId());
-        Optional<User> optionalUser = userRepository.findById(requestBody.getShowId());
+        Optional<Show> optionalShow = showRepository.findById(requestBody.getShowId());
+        Optional<User> optionalUser = userRepository.findById(requestBody.getUserId());
 
         Show show=optionalShow.orElseThrow(()-> new ElementNotFoundException("Show not found"));
         User user=optionalUser.orElseThrow(()-> new ElementNotFoundException("User not found"));

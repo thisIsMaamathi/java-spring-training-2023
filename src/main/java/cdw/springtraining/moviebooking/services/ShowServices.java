@@ -3,6 +3,8 @@ package cdw.springtraining.moviebooking.services;
 import cdw.springtraining.moviebooking.entity.Location;
 import cdw.springtraining.moviebooking.entity.Movie;
 import cdw.springtraining.moviebooking.entity.Show;
+import cdw.springtraining.moviebooking.exception.CapacityFullException;
+import cdw.springtraining.moviebooking.exception.CustomException;
 import cdw.springtraining.moviebooking.exception.ElementNotFoundException;
 import cdw.springtraining.moviebooking.exception.ShowAlreadyExistsException;
 import cdw.springtraining.moviebooking.repository.LocationRepository;
@@ -34,24 +36,24 @@ public class ShowServices {
         this.movieRepository = movieRepository;
     }
 
-    public boolean checkShowAvailability(ShowRequest request) {
-        boolean showAvailable = true;
+    public boolean isShowEngaged(ShowRequest request) {
+        boolean showEngaged = false;
         List<Show> bookedshows = showRepository.findByDate(request.getDate());
         if (!bookedshows.isEmpty()) {
 
-            showAvailable = bookedshows.stream().anyMatch(show ->
+            showEngaged = bookedshows.stream().anyMatch(show ->
                     (show.getSlot() == request.getSlot())
                             &&
                             (show.getLocation().getName().equals(request.getLocation()))
 
             );
         }
-        return showAvailable;
+        return showEngaged;
     }
 
     public ShowResponse addShow(ShowRequest request) throws Exception {
         //if show is existing in previous booked location
-        if (!checkShowAvailability(request)) {
+        if (isShowEngaged(request)) {
             throw new ShowAlreadyExistsException("Show already exists");
         }
 
@@ -90,43 +92,48 @@ public class ShowServices {
     }
 
     public String deleteShow(int showId) {
-        showRepository.deleteById(showId);
-        logger.info("Deleted the show");
-        return "Deleted";
+        Optional<Show> show=showRepository.findById(showId);
+        if(show.isPresent()) {
+            showRepository.deleteById(showId);
+            logger.info("Deleted the show");
+            return "Deleted";
+        } else throw new ElementNotFoundException("No such show found");
     }
 
-    public ShowResponse updateShow(int showId, ShowRequest request) {
+    public ShowResponse updateShow(int showId, ShowRequest request) throws Exception{
 
         Optional<Show> optionalShow = showRepository.findById(showId);
         ShowResponse showResponse;
         if (optionalShow.isPresent()) {
             Show show = optionalShow.get();
             if (request.getCount() != null)
-                if (request.getCount() < show.getCount()) {
+                if (request.getCount() >= show.getCount()) {
                     show.setCount(request.getCount());
                     showRepository.save(show);
 
-                }
+                }else throw new CustomException("Capacity cannot be reduced");
 
             if (request.getSlot() != null)
-                if (checkShowAvailability(request)) {
+                if (!isShowEngaged(request)) {
                     show.setSlot(request.getSlot());
 
-                }
+                }else throw  new ShowAlreadyExistsException("A show already exists in that slot");
 
             if (request.getDate() != null)
-                if (checkShowAvailability(request)) {
+                if (!isShowEngaged(request)) {
                     show.setDate(request.getDate());
 
-                }
+                }else throw  new ShowAlreadyExistsException("A show already exists in that slot");
 
 
             if (request.getLocation() != null) {
                 Optional<Location> locationOptional = locationRepository.findByName(request.getLocation());
                 Location location = locationOptional.orElseThrow(() -> new ElementNotFoundException("Requested Location not found for change"));
-                show.setLocation(location);
-                location.getRegionalShowsList().add(show);
 
+               if(!isShowEngaged(request)) {
+                   show.setLocation(location);
+                   location.getRegionalShowsList().add(show);
+               } else throw  new ShowAlreadyExistsException("A show already exists in that slot");
 
             }
 

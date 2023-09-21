@@ -41,7 +41,7 @@ public class ShowController {
     }
 
    @PutMapping("/{show_id}")
-    public ResponseEntity<ShowResponse> editShow(@PathVariable int show_id,@RequestBody ShowRequest request){
+    public ResponseEntity<ShowResponse> editShow(@PathVariable int show_id,@RequestBody ShowRequest request) throws Exception{
         return ResponseEntity.ok(showServices.updateShow(show_id,request));
 
    }

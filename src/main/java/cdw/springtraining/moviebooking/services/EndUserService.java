@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -51,8 +53,8 @@ public class EndUserService {
 
         BookedShowResponse response;
         if (show.getLocation().isPrime()) throw new CannotBookPrimeLocationException("Cannot Book a primeLocation");
-        else {
-            if (show.getCount() < show.getTicketsList().size()) {
+        else {logger.info("tickets:"+show.getTicketsList().size());
+            if (show.getCount() > show.getTicketsList().size()) {
                 show.getTicketsList().add(user);
                 user.getBookedShows().add(show);
                 showRepository.save(show);
@@ -113,7 +115,11 @@ public class EndUserService {
 
         int ticketsAvailable = show.getCount()-show.getTicketsList().size();
         if (ticketsAvailable>0) {
-            user.getCart().add(show);
+//            if(user.getCart()==null)
+//            { List<Object> cart=new ArrayList<>();
+//            user.setCart(cart);}
+//
+//            user.getCart().add(show);
 
             ticketsAvailable--;
           userRepository.save(user);
@@ -121,6 +127,6 @@ public class EndUserService {
         }
         else throw new CapacityFullException("Capacity full");
         return cartResponse;
-     
+
     }
 }

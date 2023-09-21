@@ -46,6 +46,7 @@ public class Show {
     @JoinTable(name = "tickets",
             joinColumns = @JoinColumn(name = "show_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
+
     private List<User> ticketsList = new ArrayList<>();
 
 
