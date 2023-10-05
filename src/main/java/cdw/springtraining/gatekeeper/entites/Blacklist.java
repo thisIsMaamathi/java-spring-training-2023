@@ -18,7 +18,13 @@ public class Blacklist {
     private int blackListId;
 
     @Column(name="aadhar")
-    private long aadhar;
-    
+    private Long aadhar;
 
+    @Column(name="user_type")
+    private String user_type;
+
+    public Blacklist(Long aadhar, String user_type) {
+        this.aadhar = aadhar;
+        this.user_type = user_type;
+    }
 }

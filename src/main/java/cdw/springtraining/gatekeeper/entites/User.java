@@ -19,12 +19,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int user_id;
 
-
     @Column(name="user_name")
     private String userName;
 
-    @Column(name="aadhar")
-    private long aadhar;
+    @Column(name="password")
+    private String password;
 
     @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
     @JoinTable(
@@ -34,6 +33,8 @@ public class User {
     )
     private List<Roles> roles=new ArrayList<>();
 
-
-
+    public User(String userName, String password) {
+        this.userName = userName;
+        this.password = password;
+    }
 }
