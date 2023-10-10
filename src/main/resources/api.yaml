@@ -233,12 +233,16 @@ paths:
             schema:
               $ref: '#/components/schemas/BlackListRequest'
       responses:
-        '204':
+        '200':
           description: Added to blacklist
+          content:
+            application/json:
+              schema:
+                type: string
         '404':
           description: Visitor not found
         '500':
-          description: Internal Server Error
+          description: Internal Server
 
   /resident/blacklist:
     post:
@@ -253,8 +257,13 @@ paths:
             schema:
               $ref: '#/components/schemas/BlackListRequest'
       responses:
-        '204':
+        '200':
           description: Added to blacklist
+          content:
+            application/json:
+              schema:
+                type: string
+
         '404':
           description: Visitor not found
         '500':
@@ -495,13 +504,6 @@ paths:
                 $ref: '#/components/schemas/ScheduleResponse'
         '500':
           description: Internal Server Error
-
-
-
-
-
-
-
 
 components:
   schemas:

@@ -24,6 +24,7 @@
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/target/generated-sources/openapi/src/main/java/cdw/springtraining/gatekeeper/models/ResidentObject.java
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/target/generated-sources/openapi/src/main/java/cdw/springtraining/gatekeeper/models/UpdateResident.java
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/src/main/java/cdw/springtraining/gatekeeper/entites/User.java
+/Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/src/main/java/cdw/springtraining/gatekeeper/aspect/LoggingAspect.java
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/src/main/java/cdw/springtraining/gatekeeper/service/AuthenticationService.java
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/src/main/java/cdw/springtraining/gatekeeper/repository/ResidentRepository.java
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/src/main/java/cdw/springtraining/gatekeeper/service/ResidentService.java
@@ -43,6 +44,7 @@
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/src/main/java/cdw/springtraining/gatekeeper/repository/BlacklistRepository.java
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/target/generated-sources/openapi/src/main/java/cdw/springtraining/gatekeeper/api/VisitorsApi.java
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/target/generated-sources/openapi/src/main/java/cdw/springtraining/gatekeeper/models/GateKeeperApprovalRequest.java
+/Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/src/main/java/cdw/springtraining/gatekeeper/entites/Token.java
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/target/generated-sources/openapi/src/main/java/cdw/springtraining/gatekeeper/api/AdminApi.java
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/src/main/java/cdw/springtraining/gatekeeper/exceptions/GlobalExceptionHandler.java
 /Users/maamathikrishnan/Documents/Domain Training/SpringFinal/gatekeeper/target/generated-sources/openapi/src/main/java/cdw/springtraining/gatekeeper/api/GateKeeperApi.java

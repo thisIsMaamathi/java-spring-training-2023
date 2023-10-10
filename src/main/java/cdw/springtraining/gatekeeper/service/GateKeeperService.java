@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class GateKeeperService {
@@ -25,19 +24,20 @@ public class GateKeeperService {
     ResidentRepository residentRepository;
     BlacklistRepository blacklistRepository;
     VisitorRepository visitorRepository;
-     @Autowired
-    public GateKeeperService(GateKeeperRepository gateKeeperRepository, ResidentRepository residentRepository, BlacklistRepository blacklistRepository,VisitorRepository visitorRepository) {
+
+    @Autowired
+    public GateKeeperService(GateKeeperRepository gateKeeperRepository, ResidentRepository residentRepository, BlacklistRepository blacklistRepository, VisitorRepository visitorRepository) {
         this.gateKeeperRepository = gateKeeperRepository;
         this.residentRepository = residentRepository;
         this.blacklistRepository = blacklistRepository;
-        this.visitorRepository=visitorRepository;
+        this.visitorRepository = visitorRepository;
     }
 
     public List<Visitor> getVisitorsList(LocalDate date) {
-        List<Visitors> visitors=visitorRepository.findByDate(date);
+        List<Visitors> visitors = visitorRepository.findByDate(date);
         return visitors.stream().map(
                 visitor -> {
-                    Visitor response= new Visitor();
+                    Visitor response = new Visitor();
                     response.setVisitorId(visitor.getVisitorId());
                     response.setResidenceId(visitor.getHouseNumber());
                     response.setVisitorName(visitor.getName());
@@ -47,30 +47,31 @@ public class GateKeeperService {
     }
 
     public String blacklistVisitor(BlackListRequest blackListRequest) {
-        Blacklist blacklist=new Blacklist(blackListRequest.getAadhar(), blackListRequest.getUserType());
-        blacklistRepository.save(blacklist);
-        return "Added to blackList";
+
+        if (blackListRequest.getUserType().equalsIgnoreCase("visitor")) {
+            Blacklist blacklist = new Blacklist(blackListRequest.getAadhar(), blackListRequest.getUserType());
+            blacklistRepository.save(blacklist);
+            return "Added to blackList";
+        } else
+            throw new RuntimeException("Enter a valid usertype");
     }
 
 
-    public String approveVisitor(Integer visitorId, GateKeeperApprovalRequest request) throws Exception {
+    public String approveVisitor(Integer visitorId, GateKeeperApprovalRequest request) {
+
+
         Visitors visitor = visitorRepository.findById(visitorId).orElseThrow(() -> new UserNotFoundException("No such visitor present"));
-        GateKeeper gateKeeper=gateKeeperRepository.findById(request.getGatekeeperId()).orElseThrow(() -> new UserNotFoundException("No such gatekeeper present"));
+        GateKeeper gateKeeper = gateKeeperRepository.findById(request.getGatekeeperId()).orElseThrow(() -> new UserNotFoundException("No such gatekeeper present"));
         visitor.setGateKeeper(gateKeeper);
         if (request.getPass().equals(visitor.getPass())) {
             visitor.setApproved(true);
             visitorRepository.save(visitor);
             return "Approved the visitor";
 
-        }
-        else {
+        } else {
             visitor.setApproved(false);
             visitorRepository.save(visitor);
             return "Rejected the visitor";
         }
     }
-
-
-
-
 }

@@ -20,7 +20,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-05T17:35:41.371367+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T18:49:48.984700+05:30[Asia/Kolkata]")
 @Validated
 @Api(value = "Visitors", description = "the Visitors API")
 public interface VisitorsApi {
@@ -45,7 +45,7 @@ public interface VisitorsApi {
         value = "/visitor",
         produces = { "application/json" }
     )
-    default ResponseEntity<ScheduleResponse> getVisitorDetails(@NotNull @ApiParam(value = "", required = true) @Valid @RequestParam(value = "visitorPass", required = true) String visitorPass) throws Exception {
+    default ResponseEntity<ScheduleResponse> getVisitorDetails(@NotNull @ApiParam(value = "", required = true) @Valid @RequestParam(value = "visitorPass", required = true) String visitorPass) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {

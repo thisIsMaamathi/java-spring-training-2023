@@ -16,6 +16,7 @@ import java.util.List;
 
 public class GateKeeper {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="gatekeeper_id")
     private int gatekeeper_id;
 

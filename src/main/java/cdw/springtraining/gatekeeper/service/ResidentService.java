@@ -3,6 +3,7 @@ package cdw.springtraining.gatekeeper.service;
 import cdw.springtraining.gatekeeper.entites.Blacklist;
 import cdw.springtraining.gatekeeper.entites.Resident;
 import cdw.springtraining.gatekeeper.entites.Visitors;
+import cdw.springtraining.gatekeeper.exceptions.UserAlreadyExistsException;
 import cdw.springtraining.gatekeeper.exceptions.UserNotFoundException;
 import cdw.springtraining.gatekeeper.models.BlackListRequest;
 import cdw.springtraining.gatekeeper.models.ScheduleRequest;
@@ -32,22 +33,31 @@ public class ResidentService {
         this.blacklistRepository = blacklistRepository;
     }
 
-    public ScheduleResponse scheduleVisit(ScheduleRequest request) throws UserNotFoundException {
+
+
+    public ScheduleResponse scheduleVisit(ScheduleRequest request)  {
+
+        Resident resident = residentRepository.findById(request.getResidentId()).orElseThrow(() -> new UserNotFoundException("Resident not found"));
+
+        if(visitorRepository.existsByAadharAndDateAndHouseNumber(request.getAadhar(),request.getDate(),resident.getResidenceNumber()))
+            throw new UserAlreadyExistsException("Your visit was already scheduled for this day");
+
         Visitors visitor = new Visitors(request.getName(), request.getDate(), request.getAadhar(), request.getPhone(), request.getAdditionalInformation());
         visitor.setPass(generatePass());
-        Resident resident = residentRepository.findById(request.getResidentId()).orElseThrow(() -> new UserNotFoundException("Resident not found"));
-        visitor.setResident(resident);
+              visitor.setResident(resident);
         visitor.setHouseNumber(resident.getResidenceNumber());
         visitorRepository.save(visitor);
 
+        Visitors visitors=visitorRepository.findByAadhar(request.getAadhar());
         ScheduleResponse scheduleResponse = new ScheduleResponse();
-        scheduleResponse.setVisitorId(visitor.getVisitorId());
+        scheduleResponse.setVisitorId(visitors.getVisitorId());
         scheduleResponse.setName(visitor.getName());
         scheduleResponse.setAadhar(visitor.getAadhar());
         scheduleResponse.setDate(visitor.getDate());
         scheduleResponse.setPhone(visitor.getPhone());
         scheduleResponse.setAdditionalInformation(visitor.getAdditionalInfo());
-        scheduleResponse.setPass(visitor.getPass());
+        scheduleResponse.setResidenceId(resident.getResidenceNumber());
+        scheduleResponse.setPass(visitors.getPass());
         return scheduleResponse;
 
     }
@@ -58,7 +68,7 @@ public class ResidentService {
     }
 
 
-    public boolean cancelVisit(int visitorId) throws Exception {
+    public boolean cancelVisit(int visitorId) {
 
         Visitors visitor=visitorRepository.findById(visitorId).orElseThrow(()->new UserNotFoundException("Visitor not found"));
 
@@ -68,11 +78,14 @@ public class ResidentService {
 
     }
 
-    public String blacklistUser(BlackListRequest blackListRequest) {
-        Blacklist blacklist=new Blacklist(blackListRequest.getAadhar(), blackListRequest.getUserType());
-        blacklistRepository.save(blacklist);
+    public String blacklistUser(BlackListRequest blackListRequest)  {
+        if(blackListRequest.getUserType().equalsIgnoreCase("visitor")||blackListRequest.getUserType().equalsIgnoreCase("gatekeeper")) {
+            Blacklist blacklist = new Blacklist(blackListRequest.getAadhar(), blackListRequest.getUserType());
+            blacklistRepository.save(blacklist);
 
-        return "Added to blackList";
+            return "Added to blackList";
+        }
+        else throw new UserNotFoundException("Enter a valid user type");
     }
 }
 

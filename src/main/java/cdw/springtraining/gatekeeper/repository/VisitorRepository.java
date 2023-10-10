@@ -12,4 +12,9 @@ public interface VisitorRepository extends JpaRepository<Visitors,Integer> {
     List<Visitors> findByDate(LocalDate date);
 
     Visitors findByPass(String visitorPass);
+
+    boolean existsByAadharAndDateAndHouseNumber(Long aadhar, LocalDate date, int residenceNumber);
+
+    Visitors findByAadhar(Long aadhar);
+
 }

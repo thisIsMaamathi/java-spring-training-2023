@@ -11,4 +11,7 @@ public interface ResidentRepository extends JpaRepository <Resident,Integer> {
 
     Resident findByAadhar(Long aadhar);
 
+
+
+    boolean existsByResidenceNumber(Integer residenceId);
 }

@@ -18,19 +18,16 @@ import cdw.springtraining.gatekeeper.entites.User;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-
+     @Autowired
     UserRepository userRepository;
-    @Autowired
-    public CustomUserDetailsService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         User user = (User) userRepository.findByUserName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not exists by Username or Email"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not exists by Username"));
 
         Set<GrantedAuthority> authorities = user.getRoles().stream()
                 .map((role) -> new SimpleGrantedAuthority(role.getRoleName()))

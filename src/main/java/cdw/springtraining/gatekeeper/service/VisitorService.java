@@ -15,7 +15,7 @@ public class VisitorService {
         this.visitorRepository = visitorRepository;
     }
 
-    public ScheduleResponse getVisitorDetails(String visitorPass) throws Exception {
+    public ScheduleResponse getVisitorDetails(String visitorPass)  {
         Visitors visitor= visitorRepository.findByPass(visitorPass);
         if(visitor!=null){
             ScheduleResponse response=new ScheduleResponse();
@@ -25,6 +25,7 @@ public class VisitorService {
             response.setAadhar(visitor.getAadhar());
             response.setAdditionalInformation(visitor.getAdditionalInfo());
             response.setPhone(visitor.getPhone());
+            response.setPass(visitor.getPass());
             response.setResidenceId(visitor.getHouseNumber());
             return response;
 

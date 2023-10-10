@@ -51,10 +51,13 @@ public class AdminService {
         return residentList;
     }
 
-    public ResidentObject createNewResident(CreateResident request) throws Exception {
+    public ResidentObject createNewResident(CreateResident request){
 
         if (residentRepository.existsByAadhar(request.getAadhar()))
             throw new UserAlreadyExistsException("You have already registered");
+
+        if(residentRepository.existsByResidenceNumber(request.getResidenceId()))
+            throw new UserAlreadyExistsException("This residence has already been registered");
 
         Resident resident = new Resident(request.getResidentName(), request.getAadhar(), request.getResidenceId(), request.getPhoneNumber(), true);
         residentRepository.save(resident);
@@ -71,14 +74,14 @@ public class AdminService {
     }
 
 
-    public boolean deleteResident(Integer residentId) throws Exception {
+    public boolean deleteResident(Integer residentId)  {
         Resident resident = residentRepository.findById(residentId).orElseThrow(() -> new UserNotFoundException("Resident not found"));
         resident.setActive(false);
         residentRepository.save(resident);
         return true;
     }
 
-    public ResidentObject updateResident(Integer residentId, UpdateResident updateResident) throws Exception {
+    public ResidentObject updateResident(Integer residentId, UpdateResident updateResident)  {
         Optional<Resident> residentOptional = residentRepository.findById(residentId);
         if (!residentOptional.get().isActive()) throw new UserHasBeenRemovedException("The resident had been deleted");
         if (residentOptional.isPresent()) {
@@ -108,7 +111,7 @@ public class AdminService {
 
     }
 
-    public ResidentObject getResidentById(Integer residentId) throws Exception {
+    public ResidentObject getResidentById(Integer residentId){
         Resident resident = residentRepository.findById(residentId).orElseThrow(() -> new UserNotFoundException("Resident Not found"));
         if (resident.isActive()) {
             ResidentObject residentObject = new ResidentObject();
@@ -123,7 +126,7 @@ public class AdminService {
 
     }
 
-    public GateKeeperObject createNewGateKeeper(CreateGateKeeper request) throws Exception {
+    public GateKeeperObject createNewGateKeeper(CreateGateKeeper request){
         if (blacklistRepository.existsByAadhar(request.getAadhar()))
             throw new BlackListedUserException("Sorry,you have been blacklisted");
 
@@ -142,7 +145,7 @@ public class AdminService {
         return gateKeeperObject;
     }
 
-    public boolean deleteAGatekeeper(Integer gatekeeperId) throws Exception {
+    public boolean deleteAGatekeeper(Integer gatekeeperId) {
         GateKeeper gateKeeper = gateKeeperRepository.findById(gatekeeperId).orElseThrow(() -> new UserNotFoundException("gateKeeper not found"));
         gateKeeper.setActive(false);
         gateKeeperRepository.save(gateKeeper);
@@ -165,7 +168,7 @@ public class AdminService {
         return gateKeeperList;
     }
 
-    public GateKeeperObject getAGateKeeper(Integer gateKeeperId) throws Exception {
+    public GateKeeperObject getAGateKeeper(Integer gateKeeperId)  {
         GateKeeper gateKeeper = gateKeeperRepository.findById(gateKeeperId).orElseThrow(() -> new UserNotFoundException("GateKeeper Not found"));
         if (gateKeeper.isActive()) {
             GateKeeperObject gateKeeperObject = new GateKeeperObject();
@@ -180,7 +183,7 @@ public class AdminService {
 
     }
 
-    public GateKeeperObject updateGateKeeper(Integer gatekeeperId, UpdateGateKeeper updateGateKeeper) throws Exception {
+    public GateKeeperObject updateGateKeeper(Integer gatekeeperId, UpdateGateKeeper updateGateKeeper){
         Optional<GateKeeper> gateKeeperOptional = gateKeeperRepository.findById(gatekeeperId);
         if (!gateKeeperOptional.get().isActive())
             throw new UserHasBeenRemovedException("The resident had been deleted");
@@ -229,18 +232,25 @@ public class AdminService {
 
     }
 
-    public UserObject approveRequest(Integer requestId) throws Exception {
+    public UserObject approveRequest(Integer requestId)  {
         ApproveRequest request=approveRequestRepository.findById(requestId).orElseThrow(()-> new UserNotFoundException("The request is not present"));
         request.setHasApproved(true);
 
         User user=new User(request.getUserName(), request.getPassword());
+
         Roles role=roleRepository.findByRoleName(request.getUserType());
         user.getRoles().add(role);
         userRepository.save(user);
 
-        Optional<User> current_user=userRepository.findByUserName(request.getUserName());
 
+        Optional<User> current_user=userRepository.findByUserName(request.getUserName());
         if(request.getUserType().equalsIgnoreCase("resident")){
+            if (residentRepository.existsByAadhar(request.getAadhar()))
+                throw new UserAlreadyExistsException("You have already registered");
+
+            if(residentRepository.existsByResidenceNumber(request.getResidenceNumber()))
+                throw new UserAlreadyExistsException("This residence has already been registered");
+
             Resident resident=new Resident(current_user.get().getUser_id(), request.getUserName(), request.getAadhar(), request.getResidenceNumber(), request.getPhoneNumber(),true);
             residentRepository.save(resident);
             UserObject userObject=new UserObject();
@@ -253,11 +263,15 @@ public class AdminService {
         }
 
         else if(request.getUserType().equalsIgnoreCase("gatekeeper")){
+
+            if (residentRepository.existsByAadhar(request.getAadhar()))
+                throw new UserAlreadyExistsException("You have already registered");
+
             if(gateKeeperRepository.existsByAadhar(request.getAadhar())) throw new BlackListedUserException("This gatekeeper had been blacklisted");
-            GateKeeper gateKeeper=new GateKeeper(user.getUser_id(),1, request.getAadhar(), request.getUserName(), request.getPhoneNumber(), true);
+            GateKeeper gateKeeper=new GateKeeper(current_user.get().getUser_id(),1, request.getAadhar(), request.getUserName(), request.getPhoneNumber(), true);
             gateKeeperRepository.save(gateKeeper);
             UserObject userObject=new UserObject();
-            userObject.setUserId(user.getUser_id());
+            userObject.setUserId(current_user.get().getUser_id());
             userObject.userName(user.getUserName());
             userObject.setPhoneNumber(gateKeeper.getPhone_number());
             userObject.setAadhar(gateKeeper.getAadhar());
@@ -265,7 +279,7 @@ public class AdminService {
             return userObject;
         }
 
-        else return null;
+        else throw new RuntimeException("Role doesnot match here, enter the user type correctly");
 
 
     }

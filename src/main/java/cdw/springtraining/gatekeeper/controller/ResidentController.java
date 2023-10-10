@@ -30,17 +30,17 @@ public class ResidentController implements ResidentApi {
     }
 
     @Override
-    public ResponseEntity<ScheduleResponse> schedule( @RequestBody ScheduleRequest scheduleRequest) throws Exception {
+    public ResponseEntity<ScheduleResponse> schedule( @RequestBody ScheduleRequest scheduleRequest)  {
         return ResponseEntity.ok(residentService.scheduleVisit(scheduleRequest));
     }
     @Override
-    public ResponseEntity cancelVisitor( Integer visitorId) throws Exception {
+    public ResponseEntity cancelVisitor( Integer visitorId)  {
      return ResponseEntity.status(204).body(residentService.cancelVisit(visitorId));
 
     }
 
     @Override
-    public ResponseEntity residentBlacklist(@RequestBody BlackListRequest blackListRequest) {
+    public ResponseEntity<String> residentBlacklist(@RequestBody BlackListRequest blackListRequest)  {
         return ResponseEntity.ok(residentService.blacklistUser(blackListRequest));
     }
 

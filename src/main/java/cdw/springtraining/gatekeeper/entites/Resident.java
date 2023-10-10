@@ -16,6 +16,7 @@ import java.util.List;
 public class Resident {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="resident_id")
     private int id;
 

@@ -6,13 +6,17 @@ cdw/springtraining/gatekeeper/models/ResidentObject.class
 cdw/springtraining/gatekeeper/entites/Blacklist.class
 cdw/springtraining/gatekeeper/exceptions/UserNotFoundException.class
 cdw/springtraining/gatekeeper/entites/Visitors.class
+cdw/springtraining/gatekeeper/controller/AdminController.class
+cdw/springtraining/gatekeeper/aspect/LoggingAspect.class
 cdw/springtraining/gatekeeper/service/AdminService.class
 cdw/springtraining/gatekeeper/repository/ResidentRepository.class
 cdw/springtraining/gatekeeper/api/ResidentApi.class
+cdw/springtraining/gatekeeper/controller/AuthController.class
 cdw/springtraining/gatekeeper/exceptions/BlackListedUserException.class
 cdw/springtraining/gatekeeper/models/GateKeeperObject.class
 cdw/springtraining/gatekeeper/models/Visitor.class
 cdw/springtraining/gatekeeper/repository/UserRepository.class
+cdw/springtraining/gatekeeper/controller/GateKeeperController.class
 cdw/springtraining/gatekeeper/models/LoginRequest.class
 cdw/springtraining/gatekeeper/api/VisitorsApi.class
 cdw/springtraining/gatekeeper/models/BlackListRequest.class
@@ -28,6 +32,8 @@ cdw/springtraining/gatekeeper/service/ResidentService.class
 cdw/springtraining/gatekeeper/repository/BlacklistRepository.class
 cdw/springtraining/gatekeeper/api/AuthApi.class
 cdw/springtraining/gatekeeper/security/JwtAuthenticationFilter.class
+cdw/springtraining/gatekeeper/exceptions/GlobalExceptionHandler.class
+cdw/springtraining/gatekeeper/controller/VisitorController.class
 cdw/springtraining/gatekeeper/api/ApiUtil.class
 cdw/springtraining/gatekeeper/models/CreateGateKeeper.class
 cdw/springtraining/gatekeeper/exceptions/UserAlreadyExistsException.class
@@ -41,6 +47,7 @@ cdw/springtraining/gatekeeper/security/JwtTokenProvider.class
 cdw/springtraining/gatekeeper/repository/VisitorRepository.class
 cdw/springtraining/gatekeeper/repository/GateKeeperRepository.class
 cdw/springtraining/gatekeeper/GatekeeperApplication.class
+cdw/springtraining/gatekeeper/controller/ResidentController.class
 cdw/springtraining/gatekeeper/models/RegistrationRequest.class
 cdw/springtraining/gatekeeper/models/UserObject.class
 cdw/springtraining/gatekeeper/exceptions/UserHasBeenRemovedException.class

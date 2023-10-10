@@ -23,7 +23,7 @@ public class VisitorController implements VisitorsApi {
     }
 
     @Override
-    public ResponseEntity<ScheduleResponse> getVisitorDetails(@RequestParam String visitorPass) throws Exception {
+    public ResponseEntity<ScheduleResponse> getVisitorDetails(@RequestParam String visitorPass) {
         return ResponseEntity.ok(visitorService.getVisitorDetails(visitorPass));
     }
 

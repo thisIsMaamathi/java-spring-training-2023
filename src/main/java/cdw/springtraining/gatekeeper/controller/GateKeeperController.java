@@ -5,7 +5,6 @@ import cdw.springtraining.gatekeeper.models.BlackListRequest;
 import cdw.springtraining.gatekeeper.models.GateKeeperApprovalRequest;
 import cdw.springtraining.gatekeeper.models.Visitor;
 import cdw.springtraining.gatekeeper.service.GateKeeperService;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -35,12 +32,12 @@ public class GateKeeperController implements GateKeeperApi {
     }
 
     @Override
-    public ResponseEntity gatekeeperBlacklist( @RequestBody BlackListRequest blackListRequest){
+    public ResponseEntity<String> gatekeeperBlacklist(@RequestBody BlackListRequest blackListRequest) {
         return ResponseEntity.ok(gateKeeperService.blacklistVisitor(blackListRequest));
     }
 
     @Override
-    public ResponseEntity<String> approveVisitor( @PathVariable Integer visitorId,  @RequestBody GateKeeperApprovalRequest request) throws Exception {
-        return  ResponseEntity.ok(gateKeeperService.approveVisitor(visitorId,request));
+    public ResponseEntity<String> approveVisitor(@PathVariable Integer visitorId, @RequestBody GateKeeperApprovalRequest request) {
+        return ResponseEntity.ok(gateKeeperService.approveVisitor(visitorId, request));
     }
 }

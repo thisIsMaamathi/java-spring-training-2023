@@ -22,7 +22,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-05T17:35:41.371367+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T18:49:48.984700+05:30[Asia/Kolkata]")
 @Validated
 @Api(value = "Resident", description = "the Resident API")
 public interface ResidentApi {
@@ -48,7 +48,7 @@ public interface ResidentApi {
         method = RequestMethod.DELETE,
         value = "/resident/cancel/{visitorId}"
     )
-    default ResponseEntity<Void> cancelVisitor(@ApiParam(value = "", required = true) @PathVariable("visitorId") Integer visitorId) throws Exception {
+    default ResponseEntity<Void> cancelVisitor(@ApiParam(value = "", required = true) @PathVariable("visitorId") Integer visitorId) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -58,21 +58,22 @@ public interface ResidentApi {
      * POST /resident/blacklist : Blacklist a visitor or a gatekeeper
      *
      * @param blackListRequest  (required)
-     * @return Added to blacklist (status code 204)
+     * @return Added to blacklist (status code 200)
      *         or Visitor not found (status code 404)
      *         or Internal Server Error (status code 500)
      */
-    @ApiOperation(value = "Blacklist a visitor or a gatekeeper", nickname = "residentBlacklist", notes = "", tags={ "Resident", })
+    @ApiOperation(value = "Blacklist a visitor or a gatekeeper", nickname = "residentBlacklist", notes = "", response = String.class, tags={ "Resident", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "Added to blacklist"),
+        @ApiResponse(code = 200, message = "Added to blacklist", response = String.class),
         @ApiResponse(code = 404, message = "Visitor not found"),
         @ApiResponse(code = 500, message = "Internal Server Error") })
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/resident/blacklist",
+        produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<Void> residentBlacklist(@ApiParam(value = "", required = true) @Valid @RequestBody BlackListRequest blackListRequest) {
+    default ResponseEntity<String> residentBlacklist(@ApiParam(value = "", required = true) @Valid @RequestBody BlackListRequest blackListRequest) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -95,7 +96,7 @@ public interface ResidentApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<ScheduleResponse> schedule(@ApiParam(value = "", required = true) @Valid @RequestBody ScheduleRequest scheduleRequest) throws Exception {
+    default ResponseEntity<ScheduleResponse> schedule(@ApiParam(value = "", required = true) @Valid @RequestBody ScheduleRequest scheduleRequest) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {

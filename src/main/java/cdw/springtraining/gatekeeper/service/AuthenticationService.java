@@ -1,10 +1,15 @@
 package cdw.springtraining.gatekeeper.service;
 
 import cdw.springtraining.gatekeeper.entites.ApproveRequest;
+import cdw.springtraining.gatekeeper.entites.Token;
 import cdw.springtraining.gatekeeper.models.LoginRequest;
 import cdw.springtraining.gatekeeper.models.RegistrationRequest;
 import cdw.springtraining.gatekeeper.repository.ApproveRequestRepository;
+import cdw.springtraining.gatekeeper.repository.TokenRepository;
+import cdw.springtraining.gatekeeper.security.JwtAuthenticationFilter;
 import cdw.springtraining.gatekeeper.security.JwtTokenProvider;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,28 +17,25 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthenticationService {
-
+    @Autowired
     ApproveRequestRepository approveRequestRepository;
 
-
+    @Autowired
     JwtTokenProvider jwtTokenProvider;
 
-
-    AuthenticationManager authenticationManager;
     @Autowired
-    public AuthenticationService(ApproveRequestRepository approveRequestRepository,JwtTokenProvider jwtTokenProvider) {
-        this.approveRequestRepository = approveRequestRepository;
+    AuthenticationManager authenticationManager;
 
-        this.jwtTokenProvider=jwtTokenProvider;
-    }
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
+    @Autowired
+    TokenRepository tokenRepository;
+
+    @Autowired
+    JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public String register(RegistrationRequest request) {
         ApproveRequest approveRequest=new ApproveRequest(request.getUserName(), request.getAadhar(),request.getResidenceId(), request.getPhoneNumber(), request.getPassword(), request.getUserType());
@@ -49,12 +51,20 @@ public class AuthenticationService {
 
         String token = jwtTokenProvider.generateToken(authentication);
 
+        Token jwtToken=new Token(token);
+        tokenRepository.save(jwtToken);
+
         return token;
 
     }
 
-    public String logoutUser() {
 
-       return "to be implemented";
+    public String logoutUser(HttpServletRequest request) {
+        String token = jwtAuthenticationFilter.getTokenFromRequest(request);
+        tokenRepository.deleteByToken(token);
+        return "Logged out";
+
     }
+
+
 }

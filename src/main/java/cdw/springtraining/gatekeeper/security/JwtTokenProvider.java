@@ -39,6 +39,7 @@ public class JwtTokenProvider {
                 .setExpiration(expireDate)
                 .signWith(key())
                 .compact();
+
         return token;
     }
 

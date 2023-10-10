@@ -26,7 +26,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-05T17:35:41.371367+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T18:49:48.984700+05:30[Asia/Kolkata]")
 @Validated
 @Api(value = "Admin", description = "the Admin API")
 public interface AdminApi {
@@ -51,7 +51,7 @@ public interface AdminApi {
         value = "/requests/approve/{requestId}",
         produces = { "application/json" }
     )
-    default ResponseEntity<UserObject> approveUser(@ApiParam(value = "", required = true) @PathVariable("requestId") Integer requestId) throws Exception {
+    default ResponseEntity<UserObject> approveUser(@ApiParam(value = "", required = true) @PathVariable("requestId") Integer requestId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -85,7 +85,7 @@ public interface AdminApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<GateKeeperObject> createGateKeeper(@ApiParam(value = "", required = true) @Valid @RequestBody CreateGateKeeper createGateKeeper) throws Exception {
+    default ResponseEntity<GateKeeperObject> createGateKeeper(@ApiParam(value = "", required = true) @Valid @RequestBody CreateGateKeeper createGateKeeper) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -119,7 +119,7 @@ public interface AdminApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<ResidentObject> createResidents(@ApiParam(value = "", required = true) @Valid @RequestBody CreateResident createResident) throws Exception {
+    default ResponseEntity<ResidentObject> createResidents(@ApiParam(value = "", required = true) @Valid @RequestBody CreateResident createResident) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -151,7 +151,7 @@ public interface AdminApi {
         method = RequestMethod.DELETE,
         value = "/gatekeepers/{gatekeeperId}"
     )
-    default ResponseEntity<Void> deleteGateKeeper(@ApiParam(value = "", required = true) @PathVariable("gatekeeperId") Integer gatekeeperId) throws Exception {
+    default ResponseEntity<Void> deleteGateKeeper(@ApiParam(value = "", required = true) @PathVariable("gatekeeperId") Integer gatekeeperId) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -174,7 +174,7 @@ public interface AdminApi {
         method = RequestMethod.DELETE,
         value = "/residents/{residentId}"
     )
-    default ResponseEntity<Void> deleteResidents(@ApiParam(value = "", required = true) @PathVariable("residentId") Integer residentId) throws Exception {
+    default ResponseEntity<Void> deleteResidents(@ApiParam(value = "", required = true) @PathVariable("residentId") Integer residentId) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -252,7 +252,7 @@ public interface AdminApi {
         value = "/residents/{residentId}",
         produces = { "application/json" }
     )
-    default ResponseEntity<ResidentObject> getResidentsById(@ApiParam(value = "", required = true) @PathVariable("residentId") Integer residentId) throws Exception {
+    default ResponseEntity<ResidentObject> getResidentsById(@ApiParam(value = "", required = true) @PathVariable("residentId") Integer residentId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -283,7 +283,7 @@ public interface AdminApi {
         value = "/gatekeepers/{gatekeeperId}",
         produces = { "application/json" }
     )
-    default ResponseEntity<GateKeeperObject> getgateKeeperById(@ApiParam(value = "", required = true) @PathVariable("gatekeeperId") Integer gatekeeperId) throws Exception {
+    default ResponseEntity<GateKeeperObject> getgateKeeperById(@ApiParam(value = "", required = true) @PathVariable("gatekeeperId") Integer gatekeeperId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -320,7 +320,7 @@ public interface AdminApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<GateKeeperObject> updateGateKeeper(@ApiParam(value = "", required = true) @PathVariable("gatekeeperId") Integer gatekeeperId,@ApiParam(value = "", required = true) @Valid @RequestBody UpdateGateKeeper updateGateKeeper) throws Exception {
+    default ResponseEntity<GateKeeperObject> updateGateKeeper(@ApiParam(value = "", required = true) @PathVariable("gatekeeperId") Integer gatekeeperId,@ApiParam(value = "", required = true) @Valid @RequestBody UpdateGateKeeper updateGateKeeper) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -357,7 +357,7 @@ public interface AdminApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<ResidentObject> updateResidents(@ApiParam(value = "", required = true) @PathVariable("residentId") Integer residentId,@ApiParam(value = "", required = true) @Valid @RequestBody UpdateResident updateResident) throws Exception {
+    default ResponseEntity<ResidentObject> updateResidents(@ApiParam(value = "", required = true) @PathVariable("residentId") Integer residentId,@ApiParam(value = "", required = true) @Valid @RequestBody UpdateResident updateResident) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {

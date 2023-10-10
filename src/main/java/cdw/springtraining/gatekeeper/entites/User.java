@@ -1,17 +1,17 @@
 package cdw.springtraining.gatekeeper.entites;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Getter
+@Setter
 @Table(name="users")
 public class User {
     @Id
@@ -25,6 +25,10 @@ public class User {
     @Column(name="password")
     private String password;
 
+
+
+
+
     @ManyToMany(cascade = {CascadeType.MERGE,CascadeType.PERSIST})
     @JoinTable(
             name="user_roles",
@@ -37,4 +41,6 @@ public class User {
         this.userName = userName;
         this.password = password;
     }
+
+
 }
