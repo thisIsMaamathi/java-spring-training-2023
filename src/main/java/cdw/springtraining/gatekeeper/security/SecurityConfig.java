@@ -38,18 +38,18 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
                 .authorizeHttpRequests((authorize) -> {
-//                    authorize.requestMatchers("/register").permitAll();
-//                    authorize.requestMatchers("/login").permitAll();
-//                    authorize.requestMatchers("/logout").permitAll();
-//                    authorize.requestMatchers("/requests/**").hasAuthority("admin");
-//                    authorize.requestMatchers("/residents/**").hasAuthority("admin");
-//                    authorize.requestMatchers("/gatekeepers/**").hasAuthority("admin");
-//                    authorize.requestMatchers("/resident/**").hasAuthority("resident");
-//                    authorize.requestMatchers("/gatekeeper/**").hasAuthority("gatekeeper");
-//                    authorize.requestMatchers("/visitor/**").permitAll();
+                    authorize.requestMatchers("/register").permitAll();
+                    authorize.requestMatchers("/login").permitAll();
+                    authorize.requestMatchers("/logout").permitAll();
+                    authorize.requestMatchers("/requests/**").hasAuthority("admin");
+                    authorize.requestMatchers("/residents/**").hasAuthority("admin");
+                    authorize.requestMatchers("/gatekeepers/**").hasAuthority("admin");
+                    authorize.requestMatchers("/resident/**").hasAuthority("resident");
+                    authorize.requestMatchers("/gatekeeper/**").hasAuthority("gatekeeper");
+                    authorize.requestMatchers("/visitor/**").permitAll();
 
-                    // authorize.anyRequest().authenticated();
-                    authorize.anyRequest().permitAll();
+                     authorize.anyRequest().authenticated();
+         
                 });
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
