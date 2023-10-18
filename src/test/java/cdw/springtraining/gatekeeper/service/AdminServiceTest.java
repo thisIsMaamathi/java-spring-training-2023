@@ -9,16 +9,16 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+/**
+ * Unit test for Admin service
+ */
 @ExtendWith(MockitoExtension.class)
 public class AdminServiceTest {
 
@@ -37,6 +37,9 @@ public class AdminServiceTest {
     @Mock
     RoleRepository roleRepository;
 
+    /**
+     * Unit testing for getAllResidents
+     */
 
     @Test
     public void testGetAllResidents() {
@@ -65,12 +68,15 @@ public class AdminServiceTest {
         residentObject.add(residentObject1);
 
 
-        when(residentRepository.findAll()).thenReturn(residentList);
+        when(residentRepository.findByIsActive(true)).thenReturn(residentList);
         List<ResidentObject> response = adminService.getAllResidents();
         assertEquals(residentObject, response);
 
     }
 
+    /**
+     * Unit test for create resident
+     */
     @Test
     public void testCreateNewResident() {
         CreateResident request = new CreateResident();
@@ -78,10 +84,7 @@ public class AdminServiceTest {
         request.setResidenceId(10);
         request.setPhoneNumber(1324567890L);
         request.setResidentName("Rose");
-
-        when(residentRepository.existsByAadhar(request.getAadhar())).thenReturn(false);
         when(residentRepository.existsByResidenceNumber(request.getResidenceId())).thenReturn(false);
-
         Resident resident = new Resident();
         resident.setId(1);
         resident.setResidenceNumber(10);
@@ -98,15 +101,14 @@ public class AdminServiceTest {
         residentObject.setPhoneNumber(1324567890L);
         residentObject.setAadhar(3456789L);
 
-
-        when(residentRepository.findByAadhar(request.getAadhar())).thenReturn(resident);
-
+        when(residentRepository.findByAadharAndResidenceNumber(request.getAadhar(),request.getResidenceId())).thenReturn(resident);
         ResidentObject response = adminService.createNewResident(request);
         assertEquals(residentObject, response);
-
-
     }
 
+    /**
+     * Unit test for exceptin in create new resident
+     */
     @Test
     public void testUserExceptionForCreateResident() {
         CreateResident request = new CreateResident();
@@ -114,11 +116,13 @@ public class AdminServiceTest {
         request.setResidenceId(10);
         request.setPhoneNumber(1324567890L);
         request.setResidentName("Rose");
-
-        when(residentRepository.existsByAadhar(request.getAadhar())).thenReturn(true);
+        when(residentRepository.existsByResidenceNumber(10)).thenReturn(true);
         assertThrows(UserAlreadyExistsException.class, () -> adminService.createNewResident(request));
     }
 
+    /**
+     * Unit testing for deleteResident
+     */
     @Test
     public void testDeleteResident() {
         Resident resident = new Resident();
@@ -131,11 +135,14 @@ public class AdminServiceTest {
         resident.setVisitorsList(new ArrayList<>());
 
         when(residentRepository.findById(1)).thenReturn(Optional.of(resident));
-        Boolean b = adminService.deleteResident(1);
-        assertEquals(true, b);
+        String b = adminService.deleteResident(1);
+        assertEquals("Deleted Resident Rose of residenceId 10" ,b);
 
     }
 
+    /**
+     * Unit tes for updateResident
+     */
     @Test
     public void testUpdateResident() {
         UpdateResident request = new UpdateResident();
@@ -165,6 +172,9 @@ public class AdminServiceTest {
 
     }
 
+    /**
+     * Unit test for getByResidentId
+     */
     @Test
     public void testGetResidentById() {
 
@@ -190,6 +200,10 @@ public class AdminServiceTest {
 
     }
 
+
+    /**
+     * Unit test for createNewGateKeeper
+     */
     @Test
     public void testCreateNewGateKeepers() {
         CreateGateKeeper request = new CreateGateKeeper();
@@ -202,7 +216,7 @@ public class AdminServiceTest {
         gateKeeper.setGatekeeper_id(1);
         gateKeeper.setGateId(1);
         gateKeeper.setActive(true);
-        gateKeeper.setGatekeeper_name("Babu");
+        gateKeeper.setGatekeeperName("Babu");
         gateKeeper.setAadhar(3456789L);
         gateKeeper.setPhone_number(1324567890L);
         gateKeeper.setVisitorsList(new ArrayList<>());
@@ -222,23 +236,30 @@ public class AdminServiceTest {
 
     }
 
+    /**
+     * Unit testing for deleteAGatekeeper
+     */
+
     @Test
     public void testDeleteGateKeeper() {
         GateKeeper gateKeeper = new GateKeeper();
         gateKeeper.setGatekeeper_id(1);
         gateKeeper.setGateId(1);
         gateKeeper.setActive(true);
-        gateKeeper.setGatekeeper_name("Babu");
+        gateKeeper.setGatekeeperName("Babu");
         gateKeeper.setAadhar(3456789L);
         gateKeeper.setPhone_number(1324567890L);
         gateKeeper.setVisitorsList(new ArrayList<>());
 
         when(gateKeeperRepository.findById(1)).thenReturn(Optional.of(gateKeeper));
-        Boolean b = adminService.deleteAGatekeeper(1);
-        assertEquals(true, b);
+        String b = adminService.deleteAGatekeeper(1);
+        assertEquals("The gatekeeper Babu has been deleted", b);
 
     }
 
+    /**
+     * Unit testing for getAllGateKeepers
+     */
     @Test
     public void testGetAllGateKeepers() {
         List<GateKeeper> gateKeepersList = new ArrayList<>();
@@ -248,7 +269,7 @@ public class AdminServiceTest {
         gateKeeper.setGatekeeper_id(1);
         gateKeeper.setGateId(1);
         gateKeeper.setActive(true);
-        gateKeeper.setGatekeeper_name("Babu");
+        gateKeeper.setGatekeeperName("Babu");
         gateKeeper.setAadhar(3456789L);
         gateKeeper.setPhone_number(1324567890L);
         gateKeeper.setVisitorsList(new ArrayList<>());
@@ -267,11 +288,15 @@ public class AdminServiceTest {
         gateKeeperObjects.add(gateKeeperObject);
 
 
-        when(gateKeeperRepository.findAll()).thenReturn(gateKeepersList);
+        when(gateKeeperRepository.findByIsActive(true)).thenReturn(gateKeepersList);
         List<GateKeeperObject> response = adminService.getAllGateKeepers();
         assertEquals(gateKeeperObjects, response);
 
     }
+
+    /**
+     * Unit test for  getAGateKeeper
+     */
 
     @Test
     public void testGetGateKeeperById() {
@@ -279,11 +304,10 @@ public class AdminServiceTest {
         gateKeeper.setGatekeeper_id(1);
         gateKeeper.setGateId(1);
         gateKeeper.setActive(true);
-        gateKeeper.setGatekeeper_name("Babu");
+        gateKeeper.setGatekeeperName("Babu");
         gateKeeper.setAadhar(3456789L);
         gateKeeper.setPhone_number(1324567890L);
         gateKeeper.setVisitorsList(new ArrayList<>());
-
 
         when(gateKeeperRepository.findById(1)).thenReturn(Optional.of(gateKeeper));
         GateKeeperObject gateKeeperObject = new GateKeeperObject();
@@ -298,6 +322,10 @@ public class AdminServiceTest {
 
     }
 
+    /**
+     * Unit for updateGateKeeper
+     */
+
     @Test
     public void testUpdateGateKeeper() {
         UpdateGateKeeper request = new UpdateGateKeeper();
@@ -309,7 +337,7 @@ public class AdminServiceTest {
         gateKeeper.setGatekeeper_id(1);
         gateKeeper.setGateId(1);
         gateKeeper.setActive(true);
-        gateKeeper.setGatekeeper_name("Babu");
+        gateKeeper.setGatekeeperName("Babu");
         gateKeeper.setAadhar(3456789L);
         gateKeeper.setPhone_number(1324567890L);
         gateKeeper.setVisitorsList(new ArrayList<>());
@@ -328,16 +356,20 @@ public class AdminServiceTest {
 
     }
 
+    /**
+     * Unit test for approveRequest
+     */
+
     @Test
-    public void testApproveRequestResident(){
-        UserObject userObject=new UserObject();
+    public void testApproveRequestResident() {
+        UserObject userObject = new UserObject();
         userObject.setUserType("resident");
         userObject.setAadhar(3456789L);
         userObject.setUserId(1);
         userObject.setPhoneNumber(345678890L);
         userObject.setUserName("Maya");
 
-        ApproveRequest approveRequest= new ApproveRequest();
+        ApproveRequest approveRequest = new ApproveRequest();
         approveRequest.setRequestId(1);
         approveRequest.setPhoneNumber(345678890L);
         approveRequest.setHasApproved(true);
@@ -350,20 +382,19 @@ public class AdminServiceTest {
         when(approveRequestRepository.findById(1)).thenReturn(Optional.of(approveRequest));
 
 
-       Roles role= new Roles();
-       role.setRoleId(1);
-       role.setRoleName("resident");
-       role.setUserList(new ArrayList<>());
+        Roles role = new Roles();
+        role.setRoleId(1);
+        role.setRoleName("resident");
+        role.setUserList(new ArrayList<>());
 
-        User user=new User();
+        User user = new User();
         user.setUser_id(1);
         user.setUserName("Maya");
         user.setRoles(new ArrayList<>());
 
-       when(roleRepository.findByRoleName(approveRequest.getUserType())).thenReturn(role);
-       when(residentRepository.existsByAadhar(approveRequest.getAadhar())).thenReturn(false);
-       when(residentRepository.existsByResidenceNumber(approveRequest.getResidenceNumber())).thenReturn(false);
-       when(userRepository.findByUserName(approveRequest.getUserName())).thenReturn(Optional.of(user));
+        when(roleRepository.findByRoleName(approveRequest.getUserType())).thenReturn(role);
+        when(residentRepository.existsByResidenceNumber(approveRequest.getResidenceNumber())).thenReturn(false);
+        when(userRepository.findByUserName(approveRequest.getUserName())).thenReturn(Optional.of(user));
         Resident resident = new Resident();
         resident.setId(1);
         resident.setResidenceNumber(10);
@@ -373,21 +404,24 @@ public class AdminServiceTest {
         resident.setPhoneNumber(1324567890L);
         resident.setVisitorsList(new ArrayList<>());
 
-        UserObject userObjectResponse= adminService.approveRequest(1);
-        assertEquals(userObject,userObjectResponse);
+        UserObject userObjectResponse = adminService.approveRequest(1);
+        assertEquals(userObject, userObjectResponse);
 
     }
 
+    /**
+     * Unit tes for approveRequest
+     */
     @Test
-    public void testApproveRequestGateKeeper(){
-        UserObject userObject=new UserObject();
+    public void testApproveRequestGateKeeper() {
+        UserObject userObject = new UserObject();
         userObject.setUserType("gatekeeper");
         userObject.setAadhar(3456789L);
         userObject.setUserId(1);
         userObject.setPhoneNumber(345678890L);
         userObject.setUserName("Maya");
 
-        ApproveRequest approveRequest= new ApproveRequest();
+        ApproveRequest approveRequest = new ApproveRequest();
         approveRequest.setRequestId(1);
         approveRequest.setPhoneNumber(345678890L);
         approveRequest.setHasApproved(true);
@@ -400,12 +434,12 @@ public class AdminServiceTest {
         when(approveRequestRepository.findById(1)).thenReturn(Optional.of(approveRequest));
 
 
-        Roles role= new Roles();
+        Roles role = new Roles();
         role.setRoleId(1);
         role.setRoleName("gatekeeper");
         role.setUserList(new ArrayList<>());
 
-        User user=new User();
+        User user = new User();
         user.setUser_id(1);
         user.setUserName("Maya");
         user.setRoles(new ArrayList<>());
@@ -418,23 +452,24 @@ public class AdminServiceTest {
         gateKeeper.setGatekeeper_id(1);
         gateKeeper.setGateId(1);
         gateKeeper.setActive(true);
-        gateKeeper.setGatekeeper_name("Babu");
+        gateKeeper.setGatekeeperName("Babu");
         gateKeeper.setAadhar(3456789L);
         gateKeeper.setPhone_number(1324567890L);
         gateKeeper.setVisitorsList(new ArrayList<>());
-       // when(gateKeeperRepository.findById(1)).thenReturn(Optional.of(gateKeeper));
 
-
-        UserObject userObjectResponse= adminService.approveRequest(1);
-        assertEquals(userObject,userObjectResponse);
+        UserObject userObjectResponse = adminService.approveRequest(1);
+        assertEquals(userObject, userObjectResponse);
 
     }
 
+    /**
+     * Unit test for viewRegistrationRequests
+     */
     @Test
-    public void viewRegnReqTest(){
+    public void viewRegnReqTest() {
 
-        List<ApproveRequest> approveRequestList=new ArrayList<>();
-        ApproveRequest approveRequest= new ApproveRequest();
+        List<ApproveRequest> approveRequestList = new ArrayList<>();
+        ApproveRequest approveRequest = new ApproveRequest();
         approveRequest.setRequestId(1);
         approveRequest.setPhoneNumber(345678890L);
         approveRequest.setHasApproved(true);
@@ -446,8 +481,8 @@ public class AdminServiceTest {
         approveRequest.setHasApproved(false);
         approveRequestList.add(approveRequest);
 
-        List<UserObject> userObjectsList=new ArrayList<>();
-        UserObject userObject=new UserObject();
+        List<UserObject> userObjectsList = new ArrayList<>();
+        UserObject userObject = new UserObject();
         userObject.setUserType("gatekeeper");
         userObject.setAadhar(3456789L);
         userObject.setUserId(1);
@@ -456,15 +491,11 @@ public class AdminServiceTest {
         userObjectsList.add(userObject);
 
         when(approveRequestRepository.findAll()).thenReturn(approveRequestList);
-        List<UserObject> response=adminService.viewRegistrationRequests();
-        assertEquals(response,userObjectsList);
-
-
+        List<UserObject> response = adminService.viewRegistrationRequests();
+        assertEquals(response, userObjectsList);
 
 
     }
-
-
 
 
 }

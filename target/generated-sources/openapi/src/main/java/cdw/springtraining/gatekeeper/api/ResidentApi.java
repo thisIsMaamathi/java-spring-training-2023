@@ -22,7 +22,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T18:49:48.984700+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
 @Validated
 @Api(value = "Resident", description = "the Resident API")
 public interface ResidentApi {
@@ -35,20 +35,21 @@ public interface ResidentApi {
      * DELETE /resident/cancel/{visitorId} : To remove a visitor
      *
      * @param visitorId  (required)
-     * @return No Content (successful deletion) (status code 204)
+     * @return Successful deletion (status code 200)
      *         or Resident not found (status code 404)
      *         or Internal Server Error (status code 500)
      */
-    @ApiOperation(value = "To remove a visitor", nickname = "cancelVisitor", notes = "", tags={ "Resident", })
+    @ApiOperation(value = "To remove a visitor", nickname = "cancelVisitor", notes = "", response = String.class, tags={ "Resident", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "No Content (successful deletion)"),
+        @ApiResponse(code = 200, message = "Successful deletion", response = String.class),
         @ApiResponse(code = 404, message = "Resident not found"),
         @ApiResponse(code = 500, message = "Internal Server Error") })
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/resident/cancel/{visitorId}"
+        value = "/resident/cancel/{visitorId}",
+        produces = { "application/json" }
     )
-    default ResponseEntity<Void> cancelVisitor(@ApiParam(value = "", required = true) @PathVariable("visitorId") Integer visitorId) {
+    default ResponseEntity<String> cancelVisitor(@ApiParam(value = "", required = true) @PathVariable("visitorId") Integer visitorId) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

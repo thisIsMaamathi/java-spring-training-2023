@@ -1,8 +1,10 @@
 package cdw.springtraining.gatekeeper.service;
 
+import cdw.springtraining.gatekeeper.constant.CommonConstants;
 import cdw.springtraining.gatekeeper.entites.Blacklist;
 import cdw.springtraining.gatekeeper.entites.Resident;
 import cdw.springtraining.gatekeeper.entites.Visitors;
+import cdw.springtraining.gatekeeper.exceptions.BlackListedUserException;
 import cdw.springtraining.gatekeeper.exceptions.UserAlreadyExistsException;
 import cdw.springtraining.gatekeeper.exceptions.UserNotFoundException;
 import cdw.springtraining.gatekeeper.models.BlackListRequest;
@@ -14,9 +16,11 @@ import cdw.springtraining.gatekeeper.repository.ResidentRepository;
 import cdw.springtraining.gatekeeper.repository.VisitorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.UUID;
 
+/**
+ * Service class for resident operations
+ */
 @Service
 public class ResidentService {
 
@@ -33,22 +37,27 @@ public class ResidentService {
         this.blacklistRepository = blacklistRepository;
     }
 
+    /**
+     * Method for scheduling a visit
+     *
+     * @param request
+     * @return Schedule response containing details about the visit
+     */
 
-
-    public ScheduleResponse scheduleVisit(ScheduleRequest request)  {
-
-        Resident resident = residentRepository.findById(request.getResidentId()).orElseThrow(() -> new UserNotFoundException("Resident not found"));
-
-        if(visitorRepository.existsByAadharAndDateAndHouseNumber(request.getAadhar(),request.getDate(),resident.getResidenceNumber()))
-            throw new UserAlreadyExistsException("Your visit was already scheduled for this day");
+    public ScheduleResponse scheduleVisit(ScheduleRequest request) {
+        Resident resident = residentRepository.findById(request.getResidentId()).orElseThrow(() -> new UserNotFoundException(CommonConstants.RESIDENT_NOT_FOUND));
+        if (blacklistRepository.existsByAadhar(request.getAadhar()))
+            throw new BlackListedUserException(CommonConstants.BLACKLISTED_VISITOR);
+        if (visitorRepository.existsByAadharAndDateAndHouseNumber(request.getAadhar(), request.getDate(), resident.getResidenceNumber()))
+            throw new UserAlreadyExistsException(CommonConstants.VISIT_ALREADY_SCHEDULED);
 
         Visitors visitor = new Visitors(request.getName(), request.getDate(), request.getAadhar(), request.getPhone(), request.getAdditionalInformation());
         visitor.setPass(generatePass());
-              visitor.setResident(resident);
+        visitor.setResident(resident);
         visitor.setHouseNumber(resident.getResidenceNumber());
         visitorRepository.save(visitor);
 
-        Visitors visitors=visitorRepository.findByAadhar(request.getAadhar());
+        Visitors visitors = visitorRepository.findByAadhar(request.getAadhar());
         ScheduleResponse scheduleResponse = new ScheduleResponse();
         scheduleResponse.setVisitorId(visitors.getVisitorId());
         scheduleResponse.setName(visitor.getName());
@@ -62,30 +71,37 @@ public class ResidentService {
 
     }
 
-
+    /**
+     * Method to genrate a pass
+     * @return Pass as a string
+     */
     public String generatePass() {
         return UUID.randomUUID().toString();
     }
 
-
-    public boolean cancelVisit(int visitorId) {
-
-        Visitors visitor=visitorRepository.findById(visitorId).orElseThrow(()->new UserNotFoundException("Visitor not found"));
-
-            visitorRepository.delete(visitor);
-            return true;
-
-
+    /**
+     * Method to cancel a visit
+     * @param visitorId
+     * @return  String with appropriate response
+     */
+    public String cancelVisit(int visitorId) {
+        Visitors visitor = visitorRepository.findById(visitorId).orElseThrow(() -> new UserNotFoundException(CommonConstants.VISITOR_NOT_FOUND));
+        visitorRepository.delete(visitor);
+        return CommonConstants.CANCELLED_VISIT;
     }
 
-    public String blacklistUser(BlackListRequest blackListRequest)  {
-        if(blackListRequest.getUserType().equalsIgnoreCase("visitor")||blackListRequest.getUserType().equalsIgnoreCase("gatekeeper")) {
+    /**
+     * Method to blacklist a user
+     * @param blackListRequest
+     * @return String with appropriate messagex
+     */
+    public String blacklistUser(BlackListRequest blackListRequest) {
+        if (blackListRequest.getUserType().equalsIgnoreCase("visitor") || blackListRequest.getUserType().equalsIgnoreCase("gatekeeper")) {
             Blacklist blacklist = new Blacklist(blackListRequest.getAadhar(), blackListRequest.getUserType());
             blacklistRepository.save(blacklist);
-
-            return "Added to blackList";
-        }
-        else throw new UserNotFoundException("Enter a valid user type");
+            return CommonConstants.ADDED_TO_BLACKLIST;
+        } else
+            throw new UserNotFoundException(CommonConstants.USER_TYPE_MISMATCH);
     }
 }
 

@@ -1,19 +1,25 @@
 package cdw.springtraining.gatekeeper.security;
 
-import io.jsonwebtoken.*;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
 import java.security.Key;
 import java.util.Date;
 
+/**
+ * Jwt helper class responsible for generating, parsing, and validating Jwt used for authentication.
+ * This class handles the creation of JWT tokens, validation of token , and extraction of user information from tokens.
+ */
 @Component
 public class JwtTokenProvider {
 
@@ -25,8 +31,13 @@ public class JwtTokenProvider {
     @Value("${app-jwt-expiration-milliseconds}")
     private long jwtExpirationDate;
 
-    // generate JWT token
-    public String generateToken(Authentication authentication){
+    /**
+     * Generates a JWT token based on user authentication information.
+     *
+     * @param authentication the user's authentication details.
+     * @return a JWT token as a string.
+     */
+    public String generateToken(Authentication authentication) {
         String username = authentication.getName();
 
         Date currentDate = new Date();
@@ -42,15 +53,19 @@ public class JwtTokenProvider {
 
         return token;
     }
-
-    private Key key(){
+    private Key key() {
         return Keys.hmacShaKeyFor(
                 Decoders.BASE64.decode(jwtSecret)
         );
     }
 
-    // get username from Jwt token
-    public String getUsername(String token){
+    /**
+     * Retrieves the username from a JWT token.
+     *
+     * @param token the JWT token as a string.
+     * @return the username extracted from the token.
+     */
+    public String getUsername(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key())
                 .build()
@@ -60,9 +75,14 @@ public class JwtTokenProvider {
         return username;
     }
 
-    // validate Jwt token
-    public boolean validateToken(String token){
-        try{
+    /**
+     * Validates the integrity and expiration of a JWT token.
+     *
+     * @param token the JWT token to be validated.
+     * @return true if the token is valid; false otherwise.
+     */
+    public boolean validateToken(String token) {
+        try {
             Jwts.parserBuilder()
                     .setSigningKey(key())
                     .build()

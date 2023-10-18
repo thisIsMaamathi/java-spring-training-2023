@@ -26,7 +26,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T18:49:48.984700+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
 @Validated
 @Api(value = "Admin", description = "the Admin API")
 public interface AdminApi {
@@ -138,20 +138,21 @@ public interface AdminApi {
      * DELETE /gatekeepers/{gatekeeperId} : Delete a gateKeeper by ID
      *
      * @param gatekeeperId  (required)
-     * @return No Content (successful deletion) (status code 204)
+     * @return Successful deletion (status code 200)
      *         or Resident not found (status code 404)
      *         or Internal Server Error (status code 500)
      */
-    @ApiOperation(value = "Delete a gateKeeper by ID", nickname = "deleteGateKeeper", notes = "", tags={ "Admin", })
+    @ApiOperation(value = "Delete a gateKeeper by ID", nickname = "deleteGateKeeper", notes = "", response = String.class, tags={ "Admin", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "No Content (successful deletion)"),
+        @ApiResponse(code = 200, message = "Successful deletion", response = String.class),
         @ApiResponse(code = 404, message = "Resident not found"),
         @ApiResponse(code = 500, message = "Internal Server Error") })
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/gatekeepers/{gatekeeperId}"
+        value = "/gatekeepers/{gatekeeperId}",
+        produces = { "application/json" }
     )
-    default ResponseEntity<Void> deleteGateKeeper(@ApiParam(value = "", required = true) @PathVariable("gatekeeperId") Integer gatekeeperId) {
+    default ResponseEntity<String> deleteGateKeeper(@ApiParam(value = "", required = true) @PathVariable("gatekeeperId") Integer gatekeeperId) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -161,20 +162,21 @@ public interface AdminApi {
      * DELETE /residents/{residentId} : Delete a resident by ID
      *
      * @param residentId  (required)
-     * @return No Content (successful deletion) (status code 204)
+     * @return Successful Deletion (status code 200)
      *         or Resident not found (status code 404)
      *         or Internal Server Error (status code 500)
      */
-    @ApiOperation(value = "Delete a resident by ID", nickname = "deleteResidents", notes = "", tags={ "Admin", })
+    @ApiOperation(value = "Delete a resident by ID", nickname = "deleteResidents", notes = "", response = String.class, tags={ "Admin", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 204, message = "No Content (successful deletion)"),
+        @ApiResponse(code = 200, message = "Successful Deletion", response = String.class),
         @ApiResponse(code = 404, message = "Resident not found"),
         @ApiResponse(code = 500, message = "Internal Server Error") })
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/residents/{residentId}"
+        value = "/residents/{residentId}",
+        produces = { "application/json" }
     )
-    default ResponseEntity<Void> deleteResidents(@ApiParam(value = "", required = true) @PathVariable("residentId") Integer residentId) {
+    default ResponseEntity<String> deleteResidents(@ApiParam(value = "", required = true) @PathVariable("residentId") Integer residentId) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

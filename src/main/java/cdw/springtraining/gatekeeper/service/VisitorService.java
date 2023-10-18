@@ -7,18 +7,28 @@ import cdw.springtraining.gatekeeper.repository.VisitorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Service class for visitor operations
+ */
 @Service
 public class VisitorService {
     VisitorRepository visitorRepository;
+
     @Autowired
     public VisitorService(VisitorRepository visitorRepository) {
         this.visitorRepository = visitorRepository;
     }
 
-    public ScheduleResponse getVisitorDetails(String visitorPass)  {
-        Visitors visitor= visitorRepository.findByPass(visitorPass);
-        if(visitor!=null){
-            ScheduleResponse response=new ScheduleResponse();
+    /**
+     * Method to view  visitor details
+     *
+     * @param visitorPass
+     * @return Schedule Response with details regarding the visit
+     */
+    public ScheduleResponse getVisitorDetails(String visitorPass) {
+        Visitors visitor = visitorRepository.findByPass(visitorPass);
+        if (visitor != null) {
+            ScheduleResponse response = new ScheduleResponse();
             response.setVisitorId(visitor.getVisitorId());
             response.setName(visitor.getName());
             response.setDate(visitor.getDate());
@@ -29,7 +39,7 @@ public class VisitorService {
             response.setResidenceId(visitor.getHouseNumber());
             return response;
 
-        }
-        else throw new UserNotFoundException("Visitor Not Found");
+        } else
+            throw new UserNotFoundException("Visitor Not Found");
     }
 }

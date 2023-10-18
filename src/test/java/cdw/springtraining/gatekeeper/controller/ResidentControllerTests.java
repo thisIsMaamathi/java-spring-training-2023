@@ -10,11 +10,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+
+/**
+ * Unit testing for Resident Controller
+ */
 
 @ExtendWith(MockitoExtension.class)
 public class ResidentControllerTests {
@@ -25,6 +26,9 @@ public class ResidentControllerTests {
     @Mock
     ResidentService residentService;
 
+    /**
+     * Unit testing for schedule
+     */
     @Test
     public void scheduleTest(){
         ScheduleResponse scheduleResponse=new ScheduleResponse();
@@ -34,16 +38,23 @@ public class ResidentControllerTests {
         ScheduleResponse response=residentController.schedule(request).getBody();
         assertEquals(scheduleResponse,response);
     }
+
+    /**
+     * Unit testing for cancel Visitor
+     */
+
     @Test
     public void testCancelVisitor(){
         Integer id=1;
-        when(residentService.cancelVisit(1)).thenReturn(true);
-        ResponseEntity response = residentController.cancelVisitor(1);
-        assertEquals(204, response.getStatusCodeValue());
-        assertEquals(true,response.getBody());
+        when(residentService.cancelVisit(1)).thenReturn("Cancelled this scheduled visit");
+        ResponseEntity<String> response = residentController.cancelVisitor(1);
+        assertEquals("Cancelled this scheduled visit",response.getBody());
 
     }
 
+    /**
+     * Unit testing for resident blacklist
+     */
     @Test
     public void testResidentBlackList(){
         BlackListRequest request=new BlackListRequest();

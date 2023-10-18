@@ -108,8 +108,12 @@ paths:
       tags:
         - Admin
       responses:
-        '204':
-          description: No Content (successful deletion)
+        '200':
+          description: Successful Deletion
+          content:
+            application/json:
+              schema:
+                type: string
         '404':
           description: Resident not found
         '500':
@@ -212,8 +216,12 @@ paths:
       tags:
         - Admin
       responses:
-        '204':
-          description: No Content (successful deletion)
+        '200':
+          description: Successful deletion
+          content:
+            application/json:
+              schema:
+                type: string
         '404':
           description: Resident not found
         '500':
@@ -226,6 +234,12 @@ paths:
       operationId: gatekeeperBlacklist
       tags:
         - GateKeeper
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -282,6 +296,11 @@ paths:
           schema:
             type: string
             format: date
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
 
       responses:
         '200':
@@ -346,7 +365,7 @@ paths:
       tags:
         - Auth
       requestBody:
-        required: true
+        #        required: true
         content:
           application/json:
             schema:
@@ -388,12 +407,19 @@ paths:
           description: Forbidden,You dont have access
 
 
-  /logout:
+  /logoff:
     post:
       summary: Allow the user to log out
       operationId: userLogout
       tags:
         - Auth
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+
       responses:
         '200':
           description: Logged out successfully
@@ -441,8 +467,12 @@ paths:
             type: integer
             format: int32
       responses:
-        '204':
-          description: No Content (successful deletion)
+        '200':
+          description: Successful deletion
+          content:
+            application/json:
+              schema:
+                type: string
         '404':
           description: Resident not found
         '500':
@@ -461,6 +491,11 @@ paths:
           schema:
             type: integer
             format: int32
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -653,6 +688,7 @@ components:
 
     RegistrationRequest:
       type: object
+      required: [userName,aadhar,phoneNumber,firstName,lastName, mailId,dob,gender,userType,password]
       properties:
         userName:
           type: string
@@ -666,15 +702,23 @@ components:
           type: string
         password:
           type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        mailId:
+          type: string
+          format: email
+        dob:
+          type: string
+          format: date
+        gender:
+          type: string
         residenceId:
           type: integer  # This property is only applicable to residents
           format: int32
-      required:
-        - userName
-        - aadhar
-        - phoneNumber
-        - userType
-        - password
+
+
 
     LoginRequest:
       type: object
@@ -707,6 +751,7 @@ components:
       properties:
         name:
           type: string
+
         aadhar:
           type: integer
           format: int64

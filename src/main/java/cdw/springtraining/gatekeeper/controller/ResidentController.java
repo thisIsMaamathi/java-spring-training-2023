@@ -1,44 +1,51 @@
 package cdw.springtraining.gatekeeper.controller;
 
 import cdw.springtraining.gatekeeper.api.ResidentApi;
-import cdw.springtraining.gatekeeper.exceptions.UserNotFoundException;
 import cdw.springtraining.gatekeeper.models.BlackListRequest;
 import cdw.springtraining.gatekeeper.models.ScheduleRequest;
 import cdw.springtraining.gatekeeper.models.ScheduleResponse;
-import cdw.springtraining.gatekeeper.repository.BlacklistRepository;
-import cdw.springtraining.gatekeeper.repository.GateKeeperRepository;
-import cdw.springtraining.gatekeeper.repository.ResidentRepository;
-import cdw.springtraining.gatekeeper.repository.VisitorRepository;
 import cdw.springtraining.gatekeeper.service.ResidentService;
-import io.swagger.annotations.ApiParam;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
-import java.util.List;
-
+/**
+ * Controller for all Resident operations
+ * Only Residents can access these endpoints
+ */
 @RestController
 public class ResidentController implements ResidentApi {
     ResidentService residentService;
 
-
     public ResidentController(ResidentService residentService) {
         this.residentService = residentService;
-
     }
 
+    /**
+     * Endpoint to schedule a visitor's entry
+     * @param scheduleRequest
+     * @return Response Entity containing the scheduled visit's information
+     */
     @Override
     public ResponseEntity<ScheduleResponse> schedule( @RequestBody ScheduleRequest scheduleRequest)  {
         return ResponseEntity.ok(residentService.scheduleVisit(scheduleRequest));
     }
-    @Override
-    public ResponseEntity cancelVisitor( Integer visitorId)  {
-     return ResponseEntity.status(204).body(residentService.cancelVisit(visitorId));
 
+    /**
+     * Endpoint to cancel a visitors entry
+     * @param visitorId
+     * @return
+     */
+    @Override
+    public ResponseEntity<String> cancelVisitor( Integer visitorId)  {
+     return ResponseEntity.status(204).body(residentService.cancelVisit(visitorId));
     }
 
+    /**
+     * Endpoint to blacklist a visitor or a gatekeeper
+     * @param blackListRequest
+     * @return String with appropriate response
+     */
     @Override
     public ResponseEntity<String> residentBlacklist(@RequestBody BlackListRequest blackListRequest)  {
         return ResponseEntity.ok(residentService.blacklistUser(blackListRequest));

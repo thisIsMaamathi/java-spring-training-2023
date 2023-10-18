@@ -4,4 +4,7 @@ import cdw.springtraining.gatekeeper.entites.ApproveRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ApproveRequestRepository extends JpaRepository<ApproveRequest,Integer> {
+    boolean existsByAadhar(Long aadhar);
+    boolean existsByUserName(String userName);
+
 }

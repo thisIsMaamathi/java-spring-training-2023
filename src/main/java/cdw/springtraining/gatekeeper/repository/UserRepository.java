@@ -11,4 +11,6 @@ public interface UserRepository extends JpaRepository<User,Integer> {
 
 
 
+
+    boolean existsByUserNameAndAadhar( String userName, Long Aadhar);
 }

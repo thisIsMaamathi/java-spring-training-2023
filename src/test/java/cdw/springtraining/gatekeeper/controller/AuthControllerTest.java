@@ -8,13 +8,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+/**
+ * Unit testing for AuthController
+ */
 @ExtendWith(MockitoExtension.class)
 public class AuthControllerTest {
     @InjectMocks
@@ -23,6 +22,9 @@ public class AuthControllerTest {
     @Mock
     AuthenticationService authenticationService;
 
+    /**
+     * Unit testing for registerUser
+     */
     @Test
     public void testRegisterUser() throws Exception {
 
@@ -35,8 +37,11 @@ public class AuthControllerTest {
 
     }
 
+    /**
+     * Unit testing for userLogin
+     */
     @Test
-    public void testUserLogin() throws Exception {
+    public void testUserLogin() {
 
         LoginRequest request = new LoginRequest();
         Object responseEntityData = new Object();
@@ -44,9 +49,17 @@ public class AuthControllerTest {
         ResponseEntity response = authController.userLogin(request);
         assertEquals("passKey",response.getBody());
 
-
     }
 
+    /**
+     * Unit testing for logout
+     */
+    @Test
+    public void logout(){
+        when(authenticationService.logoutUser("dfvghbjn")).thenReturn("Logged Out");
+        ResponseEntity response=authController.userLogout("dfvghbjn");
+        assertEquals("Logged Out",response.getBody());
+    }
 
 
 }

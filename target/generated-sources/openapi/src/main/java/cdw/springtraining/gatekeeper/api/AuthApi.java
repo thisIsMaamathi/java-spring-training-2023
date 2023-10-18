@@ -21,7 +21,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T18:49:48.984700+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
 @Validated
 @Api(value = "Auth", description = "the Auth API")
 public interface AuthApi {
@@ -33,7 +33,7 @@ public interface AuthApi {
     /**
      * POST /register : allows a user to send registration request
      *
-     * @param registrationRequest  (required)
+     * @param registrationRequest  (optional)
      * @return Appended request (status code 200)
      *         or Internal Server Error (status code 500)
      */
@@ -47,7 +47,7 @@ public interface AuthApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<String> registerUser(@ApiParam(value = "", required = true) @Valid @RequestBody RegistrationRequest registrationRequest) {
+    default ResponseEntity<String> registerUser(@ApiParam(value = "") @Valid @RequestBody(required = false) RegistrationRequest registrationRequest) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -79,8 +79,9 @@ public interface AuthApi {
 
 
     /**
-     * POST /logout : Allow the user to log out
+     * POST /logoff : Allow the user to log out
      *
+     * @param token  (required)
      * @return Logged out successfully (status code 200)
      *         or Unauthorized - User is not authenticated (status code 401)
      */
@@ -90,10 +91,10 @@ public interface AuthApi {
         @ApiResponse(code = 401, message = "Unauthorized - User is not authenticated") })
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/logout",
+        value = "/logoff",
         produces = { "application/json" }
     )
-    default ResponseEntity<String> userLogout() {
+    default ResponseEntity<String> userLogout(@ApiParam(value = "", required = true) @RequestHeader(value = "token", required = true) String token) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

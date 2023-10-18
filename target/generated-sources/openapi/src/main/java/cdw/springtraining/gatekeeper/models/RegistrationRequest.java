@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.time.LocalDate;
 import org.openapitools.jackson.nullable.JsonNullable;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -12,7 +13,7 @@ import javax.validation.constraints.*;
 /**
  * RegistrationRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T18:49:48.984700+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
 public class RegistrationRequest   {
   @JsonProperty("userName")
   private String userName;
@@ -28,6 +29,22 @@ public class RegistrationRequest   {
 
   @JsonProperty("password")
   private String password;
+
+  @JsonProperty("firstName")
+  private String firstName;
+
+  @JsonProperty("lastName")
+  private String lastName;
+
+  @JsonProperty("mailId")
+  private String mailId;
+
+  @JsonProperty("dob")
+  @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
+  private LocalDate dob;
+
+  @JsonProperty("gender")
+  private String gender;
 
   @JsonProperty("residenceId")
   private Integer residenceId;
@@ -137,6 +154,112 @@ public class RegistrationRequest   {
     this.password = password;
   }
 
+  public RegistrationRequest firstName(String firstName) {
+    this.firstName = firstName;
+    return this;
+  }
+
+  /**
+   * Get firstName
+   * @return firstName
+  */
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
+
+
+  public String getFirstName() {
+    return firstName;
+  }
+
+  public void setFirstName(String firstName) {
+    this.firstName = firstName;
+  }
+
+  public RegistrationRequest lastName(String lastName) {
+    this.lastName = lastName;
+    return this;
+  }
+
+  /**
+   * Get lastName
+   * @return lastName
+  */
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
+
+
+  public String getLastName() {
+    return lastName;
+  }
+
+  public void setLastName(String lastName) {
+    this.lastName = lastName;
+  }
+
+  public RegistrationRequest mailId(String mailId) {
+    this.mailId = mailId;
+    return this;
+  }
+
+  /**
+   * Get mailId
+   * @return mailId
+  */
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
+
+@javax.validation.constraints.Email
+  public String getMailId() {
+    return mailId;
+  }
+
+  public void setMailId(String mailId) {
+    this.mailId = mailId;
+  }
+
+  public RegistrationRequest dob(LocalDate dob) {
+    this.dob = dob;
+    return this;
+  }
+
+  /**
+   * Get dob
+   * @return dob
+  */
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
+
+  @Valid
+
+  public LocalDate getDob() {
+    return dob;
+  }
+
+  public void setDob(LocalDate dob) {
+    this.dob = dob;
+  }
+
+  public RegistrationRequest gender(String gender) {
+    this.gender = gender;
+    return this;
+  }
+
+  /**
+   * Get gender
+   * @return gender
+  */
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
+
+
+  public String getGender() {
+    return gender;
+  }
+
+  public void setGender(String gender) {
+    this.gender = gender;
+  }
+
   public RegistrationRequest residenceId(Integer residenceId) {
     this.residenceId = residenceId;
     return this;
@@ -172,12 +295,17 @@ public class RegistrationRequest   {
         Objects.equals(this.phoneNumber, registrationRequest.phoneNumber) &&
         Objects.equals(this.userType, registrationRequest.userType) &&
         Objects.equals(this.password, registrationRequest.password) &&
+        Objects.equals(this.firstName, registrationRequest.firstName) &&
+        Objects.equals(this.lastName, registrationRequest.lastName) &&
+        Objects.equals(this.mailId, registrationRequest.mailId) &&
+        Objects.equals(this.dob, registrationRequest.dob) &&
+        Objects.equals(this.gender, registrationRequest.gender) &&
         Objects.equals(this.residenceId, registrationRequest.residenceId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(userName, aadhar, phoneNumber, userType, password, residenceId);
+    return Objects.hash(userName, aadhar, phoneNumber, userType, password, firstName, lastName, mailId, dob, gender, residenceId);
   }
 
   @Override
@@ -190,6 +318,11 @@ public class RegistrationRequest   {
     sb.append("    phoneNumber: ").append(toIndentedString(phoneNumber)).append("\n");
     sb.append("    userType: ").append(toIndentedString(userType)).append("\n");
     sb.append("    password: ").append(toIndentedString(password)).append("\n");
+    sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
+    sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
+    sb.append("    mailId: ").append(toIndentedString(mailId)).append("\n");
+    sb.append("    dob: ").append(toIndentedString(dob)).append("\n");
+    sb.append("    gender: ").append(toIndentedString(gender)).append("\n");
     sb.append("    residenceId: ").append(toIndentedString(residenceId)).append("\n");
     sb.append("}");
     return sb.toString();

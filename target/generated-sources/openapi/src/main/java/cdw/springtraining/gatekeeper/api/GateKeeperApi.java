@@ -23,7 +23,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-06T18:49:48.984700+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
 @Validated
 @Api(value = "GateKeeper", description = "the GateKeeper API")
 public interface GateKeeperApi {
@@ -36,6 +36,7 @@ public interface GateKeeperApi {
      * PUT /gateKeeper/approve/{visitorId} : allows Gatekeeper to approve a visitor
      *
      * @param visitorId  (required)
+     * @param token  (required)
      * @param gateKeeperApprovalRequest  (required)
      * @return Approved the vistor (status code 200)
      *         or Internal Server Error (status code 500)
@@ -50,7 +51,7 @@ public interface GateKeeperApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<String> approveVisitor(@ApiParam(value = "", required = true) @PathVariable("visitorId") Integer visitorId,@ApiParam(value = "", required = true) @Valid @RequestBody GateKeeperApprovalRequest gateKeeperApprovalRequest) {
+    default ResponseEntity<String> approveVisitor(@ApiParam(value = "", required = true) @PathVariable("visitorId") Integer visitorId,@ApiParam(value = "", required = true) @RequestHeader(value = "token", required = true) String token,@ApiParam(value = "", required = true) @Valid @RequestBody GateKeeperApprovalRequest gateKeeperApprovalRequest) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -59,6 +60,7 @@ public interface GateKeeperApi {
     /**
      * POST /gatekeeper/blacklist : Blacklist a visitor
      *
+     * @param token  (required)
      * @param blackListRequest  (required)
      * @return Added to blacklist (status code 200)
      *         or Visitor not found (status code 404)
@@ -75,7 +77,7 @@ public interface GateKeeperApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<String> gatekeeperBlacklist(@ApiParam(value = "", required = true) @Valid @RequestBody BlackListRequest blackListRequest) {
+    default ResponseEntity<String> gatekeeperBlacklist(@ApiParam(value = "", required = true) @RequestHeader(value = "token", required = true) String token,@ApiParam(value = "", required = true) @Valid @RequestBody BlackListRequest blackListRequest) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -85,6 +87,7 @@ public interface GateKeeperApi {
      * GET /gatekeeper/visitors : Get a list of visitors as per given date
      *
      * @param date  (required)
+     * @param token  (required)
      * @return A List of all visitors visiting on that date (status code 200)
      *         or Visitor not found (status code 404)
      *         or Internal Server Error (status code 500)
@@ -99,7 +102,7 @@ public interface GateKeeperApi {
         value = "/gatekeeper/visitors",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<Visitor>> getVisitorsByDate(@NotNull @ApiParam(value = "", required = true) @Valid @RequestParam(value = "date", required = true) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate date) {
+    default ResponseEntity<List<Visitor>> getVisitorsByDate(@NotNull @ApiParam(value = "", required = true) @Valid @RequestParam(value = "date", required = true) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate date,@ApiParam(value = "", required = true) @RequestHeader(value = "token", required = true) String token) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
