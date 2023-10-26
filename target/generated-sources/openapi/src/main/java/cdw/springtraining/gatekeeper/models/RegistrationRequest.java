@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
 /**
  * RegistrationRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-26T16:12:55.335364+05:30[Asia/Kolkata]")
 public class RegistrationRequest   {
   @JsonProperty("userName")
   private String userName;
@@ -36,8 +36,8 @@ public class RegistrationRequest   {
   @JsonProperty("lastName")
   private String lastName;
 
-  @JsonProperty("mailId")
-  private String mailId;
+  @JsonProperty("email")
+  private String email;
 
   @JsonProperty("dob")
   @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE)
@@ -58,8 +58,7 @@ public class RegistrationRequest   {
    * Get userName
    * @return userName
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 
   public String getUserName() {
@@ -79,8 +78,7 @@ public class RegistrationRequest   {
    * Get aadhar
    * @return aadhar
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 
   public Long getAadhar() {
@@ -100,8 +98,7 @@ public class RegistrationRequest   {
    * Get phoneNumber
    * @return phoneNumber
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 
   public Long getPhoneNumber() {
@@ -121,8 +118,7 @@ public class RegistrationRequest   {
    * Get userType
    * @return userType
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 
   public String getUserType() {
@@ -142,8 +138,7 @@ public class RegistrationRequest   {
    * Get password
    * @return password
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 
   public String getPassword() {
@@ -163,8 +158,7 @@ public class RegistrationRequest   {
    * Get firstName
    * @return firstName
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 
   public String getFirstName() {
@@ -184,8 +178,7 @@ public class RegistrationRequest   {
    * Get lastName
    * @return lastName
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 
   public String getLastName() {
@@ -196,25 +189,24 @@ public class RegistrationRequest   {
     this.lastName = lastName;
   }
 
-  public RegistrationRequest mailId(String mailId) {
-    this.mailId = mailId;
+  public RegistrationRequest email(String email) {
+    this.email = email;
     return this;
   }
 
   /**
-   * Get mailId
-   * @return mailId
+   * Get email
+   * @return email
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 @javax.validation.constraints.Email
-  public String getMailId() {
-    return mailId;
+  public String getEmail() {
+    return email;
   }
 
-  public void setMailId(String mailId) {
-    this.mailId = mailId;
+  public void setEmail(String email) {
+    this.email = email;
   }
 
   public RegistrationRequest dob(LocalDate dob) {
@@ -226,8 +218,7 @@ public class RegistrationRequest   {
    * Get dob
    * @return dob
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
   @Valid
 
@@ -248,8 +239,7 @@ public class RegistrationRequest   {
    * Get gender
    * @return gender
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 
   public String getGender() {
@@ -297,7 +287,7 @@ public class RegistrationRequest   {
         Objects.equals(this.password, registrationRequest.password) &&
         Objects.equals(this.firstName, registrationRequest.firstName) &&
         Objects.equals(this.lastName, registrationRequest.lastName) &&
-        Objects.equals(this.mailId, registrationRequest.mailId) &&
+        Objects.equals(this.email, registrationRequest.email) &&
         Objects.equals(this.dob, registrationRequest.dob) &&
         Objects.equals(this.gender, registrationRequest.gender) &&
         Objects.equals(this.residenceId, registrationRequest.residenceId);
@@ -305,7 +295,7 @@ public class RegistrationRequest   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(userName, aadhar, phoneNumber, userType, password, firstName, lastName, mailId, dob, gender, residenceId);
+    return Objects.hash(userName, aadhar, phoneNumber, userType, password, firstName, lastName, email, dob, gender, residenceId);
   }
 
   @Override
@@ -320,7 +310,7 @@ public class RegistrationRequest   {
     sb.append("    password: ").append(toIndentedString(password)).append("\n");
     sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
     sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
-    sb.append("    mailId: ").append(toIndentedString(mailId)).append("\n");
+    sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    dob: ").append(toIndentedString(dob)).append("\n");
     sb.append("    gender: ").append(toIndentedString(gender)).append("\n");
     sb.append("    residenceId: ").append(toIndentedString(residenceId)).append("\n");

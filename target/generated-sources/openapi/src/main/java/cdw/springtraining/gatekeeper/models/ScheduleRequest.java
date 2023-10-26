@@ -13,10 +13,10 @@ import javax.validation.constraints.*;
 /**
  * ScheduleRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-26T16:12:55.335364+05:30[Asia/Kolkata]")
 public class ScheduleRequest   {
-  @JsonProperty("name")
-  private String name;
+  @JsonProperty("visitorName")
+  private String visitorName;
 
   @JsonProperty("aadhar")
   private Long aadhar;
@@ -31,28 +31,27 @@ public class ScheduleRequest   {
   @JsonProperty("additionalInformation")
   private String additionalInformation;
 
-  @JsonProperty("residentId")
-  private Integer residentId;
+  @JsonProperty("residenceId")
+  private Integer residenceId;
 
-  public ScheduleRequest name(String name) {
-    this.name = name;
+  public ScheduleRequest visitorName(String visitorName) {
+    this.visitorName = visitorName;
     return this;
   }
 
   /**
-   * Get name
-   * @return name
+   * Get visitorName
+   * @return visitorName
   */
-  @ApiModelProperty(required = true, value = "")
-  @NotNull
+  @ApiModelProperty(value = "")
 
 
-  public String getName() {
-    return name;
+  public String getVisitorName() {
+    return visitorName;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setVisitorName(String visitorName) {
+    this.visitorName = visitorName;
   }
 
   public ScheduleRequest aadhar(Long aadhar) {
@@ -139,25 +138,25 @@ public class ScheduleRequest   {
     this.additionalInformation = additionalInformation;
   }
 
-  public ScheduleRequest residentId(Integer residentId) {
-    this.residentId = residentId;
+  public ScheduleRequest residenceId(Integer residenceId) {
+    this.residenceId = residenceId;
     return this;
   }
 
   /**
-   * Get residentId
-   * @return residentId
+   * Get residenceId
+   * @return residenceId
   */
   @ApiModelProperty(required = true, value = "")
   @NotNull
 
 
-  public Integer getResidentId() {
-    return residentId;
+  public Integer getResidenceId() {
+    return residenceId;
   }
 
-  public void setResidentId(Integer residentId) {
-    this.residentId = residentId;
+  public void setResidenceId(Integer residenceId) {
+    this.residenceId = residenceId;
   }
 
 
@@ -170,17 +169,17 @@ public class ScheduleRequest   {
       return false;
     }
     ScheduleRequest scheduleRequest = (ScheduleRequest) o;
-    return Objects.equals(this.name, scheduleRequest.name) &&
+    return Objects.equals(this.visitorName, scheduleRequest.visitorName) &&
         Objects.equals(this.aadhar, scheduleRequest.aadhar) &&
         Objects.equals(this.date, scheduleRequest.date) &&
         Objects.equals(this.phone, scheduleRequest.phone) &&
         Objects.equals(this.additionalInformation, scheduleRequest.additionalInformation) &&
-        Objects.equals(this.residentId, scheduleRequest.residentId);
+        Objects.equals(this.residenceId, scheduleRequest.residenceId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(name, aadhar, date, phone, additionalInformation, residentId);
+    return Objects.hash(visitorName, aadhar, date, phone, additionalInformation, residenceId);
   }
 
   @Override
@@ -188,12 +187,12 @@ public class ScheduleRequest   {
     StringBuilder sb = new StringBuilder();
     sb.append("class ScheduleRequest {\n");
     
-    sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    visitorName: ").append(toIndentedString(visitorName)).append("\n");
     sb.append("    aadhar: ").append(toIndentedString(aadhar)).append("\n");
     sb.append("    date: ").append(toIndentedString(date)).append("\n");
     sb.append("    phone: ").append(toIndentedString(phone)).append("\n");
     sb.append("    additionalInformation: ").append(toIndentedString(additionalInformation)).append("\n");
-    sb.append("    residentId: ").append(toIndentedString(residentId)).append("\n");
+    sb.append("    residenceId: ").append(toIndentedString(residenceId)).append("\n");
     sb.append("}");
     return sb.toString();
   }

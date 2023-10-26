@@ -1,5 +1,6 @@
 package cdw.springtraining.gatekeeper.exceptions;
 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,13 +8,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-        ErrorResponse errorResponse = new ErrorResponse("500", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse("500", "Some problem occurred");
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -47,11 +49,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
+
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleNoValidationException(ConstraintViolationException ex) {
-        String message = String.valueOf(new ArrayList<>(ex.getConstraintViolations()).get(0).getMessage());
-        ErrorResponse errorResponse = new ErrorResponse("400", message);
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<List<ValidationError>> handleValidationException(ConstraintViolationException ex) {
+        List<ValidationError> errors = new ArrayList<>();
+        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+            ValidationError error = new ValidationError(
+                    violation.getPropertyPath().toString(),
+                    violation.getMessage()
+            );
+            errors.add(error);
+        }
+
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
 

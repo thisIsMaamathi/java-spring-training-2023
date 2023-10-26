@@ -42,4 +42,16 @@ public class CommonConstants {
     public static final String BLACKLISTED_EXCEPTION = "Sorry, you were blacklisted.....contact admin for more details";
     public static final String APPENDED_REQUEST = "Appended Request";
     public static final String CANCELLED_VISIT = "Cancelled this scheduled visit";
+    public static final String GATEKEPER_CANNOT_HAVE_RESIDENCE_NUMBER = "Gatekeeper cannot have a residence id" ;
+    public static final String RESIDENCE_NUMBER_NOT_MENTIONED = "Please enter your residence number";
+    public static final String NO_REQUEST_TO_APPROVE = "No requests for approval";
+    public static final String USER_ALREADY_DELETED = "The requested user had already been deleted";
+
+    public static final String ALREADY_BLACKLISTED = "user was already blacklisted";
+    public static final String USER_ALREADY_APPROVED = "User had already been approved";
+    public static final String USER_IS_ADMIN = "The user id you are trying to enter belongs to an admin. You cannot approve an admin" ;
+    public static final String YET_TO_BE_APPROVED = "The admin has not yet approved your request";
+
+    public static final String VISITOR_ALREADY_ENTERED = "The visitor had already entered the apartment";
+    public static final String LOGGED_OUT = "Logged out";
 }

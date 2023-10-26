@@ -1,10 +1,13 @@
 package cdw.springtraining.gatekeeper.service;
-
-import cdw.springtraining.gatekeeper.entites.ApproveRequest;
+import cdw.springtraining.gatekeeper.entites.Roles;
+import cdw.springtraining.gatekeeper.entites.Users;
+import cdw.springtraining.gatekeeper.models.LoggingResponse;
 import cdw.springtraining.gatekeeper.models.LoginRequest;
 import cdw.springtraining.gatekeeper.models.RegistrationRequest;
-import cdw.springtraining.gatekeeper.repository.ApproveRequestRepository;
+import cdw.springtraining.gatekeeper.models.RegistrationResponse;
+import cdw.springtraining.gatekeeper.repository.RolesRepository;
 import cdw.springtraining.gatekeeper.repository.TokenRepository;
+import cdw.springtraining.gatekeeper.repository.UserRepository;
 import cdw.springtraining.gatekeeper.security.JwtAuthenticationFilter;
 import cdw.springtraining.gatekeeper.security.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
@@ -21,8 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 /**
  * Unit test for authentication service class
@@ -32,9 +37,6 @@ public class AuthenticationServiceTest {
 
     @InjectMocks
     AuthenticationService authenticationService;
-
-    @Mock
-    ApproveRequestRepository approveRequestRepository;
 
     @Mock
     JwtTokenProvider jwtTokenProvider;
@@ -47,6 +49,13 @@ public class AuthenticationServiceTest {
 
     @Mock
     JwtAuthenticationFilter jwtAuthenticationFilter;
+    @Mock
+    UserRepository userRepository;
+    @Mock
+    RolesRepository rolesRepository;
+
+    @Mock
+    PasswordEncoder passwordEncoder;
 
     /**
      * unit testing for register
@@ -62,15 +71,25 @@ public class AuthenticationServiceTest {
         request.setFirstName("Raj");
         request.setLastName("Ram");
         request.setUserName("RajHere");
-        request.setMailId("Raj@Ram");
+        request.setEmail("Raj@Ram");
         request.setPassword("56778");
         request.setUserType("resident");
 
-        when(approveRequestRepository.existsByAadhar(request.getAadhar())).thenReturn(false);
-        when(approveRequestRepository.existsByUserName(request.getUserName())).thenReturn(false);
+        Roles role=new Roles();
+        role.setRoleName("resident");
+        role.setRoleId(1);
 
-        String response= authenticationService.register(request);
-        assertEquals("Appended Request",response);
+        when(userRepository.existsByAadhar(request.getAadhar())).thenReturn(false);
+        when(userRepository.existsByResidenceNumber(10)).thenReturn(false);
+        when(rolesRepository.findByRoleName("resident")).thenReturn(role);
+        when(passwordEncoder.encode(request.getPassword())).thenReturn("encoded Password");
+
+        RegistrationResponse registrationResponse=new RegistrationResponse();
+        registrationResponse.setMessage("Registered successfully");
+
+        RegistrationResponse response= authenticationService.register(request);
+
+        assertEquals(registrationResponse,response);
 
     }
 
@@ -84,14 +103,25 @@ public class AuthenticationServiceTest {
         request.setUserName("Ram");
         request.setPassword("1234");
 
+        Users user=new Users();
+        user.setUserName("Ram");
+        user.setPassword("1234");
+        user.setUserType("resident");
+        user.setIsApproved("approved");
+        user.setActive(true);
+
+        when(userRepository.findByUserName(request.getUserName())).thenReturn(Optional.of(user));
+
         Authentication authentication = mock(Authentication.class);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
 
         String mockToken = "mockedToken";
         when(jwtTokenProvider.generateToken(authentication)).thenReturn(mockToken);
+        LoggingResponse loggingResponse=new LoggingResponse();
+        loggingResponse.setMessage(mockToken);
 
-        String generatedToken = authenticationService.authenticateUser(request);
-        assertEquals(mockToken, generatedToken);
+        LoggingResponse generatedToken = authenticationService.authenticateUser(request);
+        assertEquals(loggingResponse, generatedToken);
 
     }
 
@@ -102,9 +132,12 @@ public class AuthenticationServiceTest {
     public void testlogoutUser(){
         String token="Bearer sxfdcgvh";
         String target="sxfdcgvh";
+        LoggingResponse loggingResponse=new LoggingResponse();
+        loggingResponse.setMessage("Logged out");
 
-        String response= authenticationService.logoutUser(token);
-        assertEquals("Logged out",response);
+       LoggingResponse response= authenticationService.logoutUser(token);
+
+        assertEquals(loggingResponse,response);
 
 
     }

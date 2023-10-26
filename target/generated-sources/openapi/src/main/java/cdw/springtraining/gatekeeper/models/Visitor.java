@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 /**
  * Visitor
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-26T16:12:55.335364+05:30[Asia/Kolkata]")
 public class Visitor   {
   @JsonProperty("visitorId")
   private Integer visitorId;
@@ -22,6 +22,15 @@ public class Visitor   {
 
   @JsonProperty("residenceId")
   private Integer residenceId;
+
+  @JsonProperty("phoneNumber")
+  private Long phoneNumber;
+
+  @JsonProperty("isApproved")
+  private String isApproved;
+
+  @JsonProperty("hasCheckedIn")
+  private Boolean hasCheckedIn;
 
   public Visitor visitorId(Integer visitorId) {
     this.visitorId = visitorId;
@@ -83,6 +92,66 @@ public class Visitor   {
     this.residenceId = residenceId;
   }
 
+  public Visitor phoneNumber(Long phoneNumber) {
+    this.phoneNumber = phoneNumber;
+    return this;
+  }
+
+  /**
+   * Get phoneNumber
+   * @return phoneNumber
+  */
+  @ApiModelProperty(value = "")
+
+
+  public Long getPhoneNumber() {
+    return phoneNumber;
+  }
+
+  public void setPhoneNumber(Long phoneNumber) {
+    this.phoneNumber = phoneNumber;
+  }
+
+  public Visitor isApproved(String isApproved) {
+    this.isApproved = isApproved;
+    return this;
+  }
+
+  /**
+   * Get isApproved
+   * @return isApproved
+  */
+  @ApiModelProperty(value = "")
+
+
+  public String getIsApproved() {
+    return isApproved;
+  }
+
+  public void setIsApproved(String isApproved) {
+    this.isApproved = isApproved;
+  }
+
+  public Visitor hasCheckedIn(Boolean hasCheckedIn) {
+    this.hasCheckedIn = hasCheckedIn;
+    return this;
+  }
+
+  /**
+   * Get hasCheckedIn
+   * @return hasCheckedIn
+  */
+  @ApiModelProperty(value = "")
+
+
+  public Boolean getHasCheckedIn() {
+    return hasCheckedIn;
+  }
+
+  public void setHasCheckedIn(Boolean hasCheckedIn) {
+    this.hasCheckedIn = hasCheckedIn;
+  }
+
 
   @Override
   public boolean equals(Object o) {
@@ -95,12 +164,15 @@ public class Visitor   {
     Visitor visitor = (Visitor) o;
     return Objects.equals(this.visitorId, visitor.visitorId) &&
         Objects.equals(this.visitorName, visitor.visitorName) &&
-        Objects.equals(this.residenceId, visitor.residenceId);
+        Objects.equals(this.residenceId, visitor.residenceId) &&
+        Objects.equals(this.phoneNumber, visitor.phoneNumber) &&
+        Objects.equals(this.isApproved, visitor.isApproved) &&
+        Objects.equals(this.hasCheckedIn, visitor.hasCheckedIn);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(visitorId, visitorName, residenceId);
+    return Objects.hash(visitorId, visitorName, residenceId, phoneNumber, isApproved, hasCheckedIn);
   }
 
   @Override
@@ -111,6 +183,9 @@ public class Visitor   {
     sb.append("    visitorId: ").append(toIndentedString(visitorId)).append("\n");
     sb.append("    visitorName: ").append(toIndentedString(visitorName)).append("\n");
     sb.append("    residenceId: ").append(toIndentedString(residenceId)).append("\n");
+    sb.append("    phoneNumber: ").append(toIndentedString(phoneNumber)).append("\n");
+    sb.append("    isApproved: ").append(toIndentedString(isApproved)).append("\n");
+    sb.append("    hasCheckedIn: ").append(toIndentedString(hasCheckedIn)).append("\n");
     sb.append("}");
     return sb.toString();
   }

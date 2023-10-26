@@ -2,10 +2,13 @@
 package cdw.springtraining.gatekeeper.controller;
 
 import cdw.springtraining.gatekeeper.api.AuthApi;
+import cdw.springtraining.gatekeeper.models.LoggingResponse;
 import cdw.springtraining.gatekeeper.models.LoginRequest;
 import cdw.springtraining.gatekeeper.models.RegistrationRequest;
+import cdw.springtraining.gatekeeper.models.RegistrationResponse;
 import cdw.springtraining.gatekeeper.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -26,7 +29,7 @@ public class AuthController implements AuthApi {
      * @return String containing appropriate message
      */
     @Override
-    public ResponseEntity<String> registerUser(@RequestBody RegistrationRequest registrationRequest) {
+    public ResponseEntity<RegistrationResponse> registerUser(@RequestBody RegistrationRequest registrationRequest) {
         return ResponseEntity.status(200).body(authenticationService.register(registrationRequest));
     }
 
@@ -36,8 +39,8 @@ public class AuthController implements AuthApi {
      * @return Jwt token for user
      */
     @Override
-    public ResponseEntity<String> userLogin(@RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authenticationService.authenticateUser(request));
+    public ResponseEntity<LoggingResponse> userLogin(@RequestBody LoginRequest request) {
+        return ResponseEntity.status(HttpStatus.OK).body(authenticationService.authenticateUser(request));
     }
 
     /**
@@ -46,8 +49,8 @@ public class AuthController implements AuthApi {
      * @return String with appropriate message
      */
     @Override
-    public ResponseEntity<String> userLogout(@RequestHeader(name = "Authorization") String token) {
-        return ResponseEntity.ok(authenticationService.logoutUser(token));
+    public ResponseEntity<LoggingResponse> userLogout(@RequestHeader(name = "Authorization") String token) {
+        return ResponseEntity.status(HttpStatus.OK).body(authenticationService.logoutUser(token));
     }
 
 }

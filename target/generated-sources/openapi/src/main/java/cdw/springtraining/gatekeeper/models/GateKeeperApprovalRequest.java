@@ -12,13 +12,10 @@ import javax.validation.constraints.*;
 /**
  * GateKeeperApprovalRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-26T16:12:55.335364+05:30[Asia/Kolkata]")
 public class GateKeeperApprovalRequest   {
   @JsonProperty("pass")
   private String pass;
-
-  @JsonProperty("gatekeeperId")
-  private Integer gatekeeperId;
 
   public GateKeeperApprovalRequest pass(String pass) {
     this.pass = pass;
@@ -40,26 +37,6 @@ public class GateKeeperApprovalRequest   {
     this.pass = pass;
   }
 
-  public GateKeeperApprovalRequest gatekeeperId(Integer gatekeeperId) {
-    this.gatekeeperId = gatekeeperId;
-    return this;
-  }
-
-  /**
-   * Get gatekeeperId
-   * @return gatekeeperId
-  */
-  @ApiModelProperty(value = "")
-
-
-  public Integer getGatekeeperId() {
-    return gatekeeperId;
-  }
-
-  public void setGatekeeperId(Integer gatekeeperId) {
-    this.gatekeeperId = gatekeeperId;
-  }
-
 
   @Override
   public boolean equals(Object o) {
@@ -70,13 +47,12 @@ public class GateKeeperApprovalRequest   {
       return false;
     }
     GateKeeperApprovalRequest gateKeeperApprovalRequest = (GateKeeperApprovalRequest) o;
-    return Objects.equals(this.pass, gateKeeperApprovalRequest.pass) &&
-        Objects.equals(this.gatekeeperId, gateKeeperApprovalRequest.gatekeeperId);
+    return Objects.equals(this.pass, gateKeeperApprovalRequest.pass);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(pass, gatekeeperId);
+    return Objects.hash(pass);
   }
 
   @Override
@@ -85,7 +61,6 @@ public class GateKeeperApprovalRequest   {
     sb.append("class GateKeeperApprovalRequest {\n");
     
     sb.append("    pass: ").append(toIndentedString(pass)).append("\n");
-    sb.append("    gatekeeperId: ").append(toIndentedString(gatekeeperId)).append("\n");
     sb.append("}");
     return sb.toString();
   }

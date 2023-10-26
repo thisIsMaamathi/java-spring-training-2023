@@ -1,25 +1,29 @@
 package cdw.springtraining.gatekeeper.service;
-
-import cdw.springtraining.gatekeeper.entites.GateKeeper;
-import cdw.springtraining.gatekeeper.entites.Resident;
+import cdw.springtraining.gatekeeper.entites.Roles;
+import cdw.springtraining.gatekeeper.entites.Users;
 import cdw.springtraining.gatekeeper.entites.Visitors;
-import cdw.springtraining.gatekeeper.models.BlackListRequest;
-import cdw.springtraining.gatekeeper.models.GateKeeperApprovalRequest;
-import cdw.springtraining.gatekeeper.models.Visitor;
-import cdw.springtraining.gatekeeper.repository.BlacklistRepository;
-import cdw.springtraining.gatekeeper.repository.GateKeeperRepository;
-import cdw.springtraining.gatekeeper.repository.ResidentRepository;
+import cdw.springtraining.gatekeeper.exceptions.BlackListedUserException;
+import cdw.springtraining.gatekeeper.models.*;
+import cdw.springtraining.gatekeeper.repository.BlackListRepository;
+import cdw.springtraining.gatekeeper.repository.UserRepository;
 import cdw.springtraining.gatekeeper.repository.VisitorRepository;
+import cdw.springtraining.gatekeeper.security.CustomUserDetailsService;
 import cdw.springtraining.gatekeeper.security.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.stubbing.OngoingStubbing;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,16 +38,16 @@ public class GateKeeperServiceTest {
     @InjectMocks
     GateKeeperService gateKeeperService;
     @Mock
-    GateKeeperRepository gateKeeperRepository;
-    @Mock
-    ResidentRepository residentRepository;
-    @Mock
-    BlacklistRepository blacklistRepository;
+    BlackListRepository blacklistRepository;
     @Mock
     VisitorRepository visitorRepository;
-
     @Mock
     JwtTokenProvider jwtTokenProvider;
+
+    @Mock
+    CustomUserDetailsService customUserDetailsService;
+    @Mock
+    UserRepository userRepository;
 
     /**
      * Unit test for getVisitorsList
@@ -58,37 +62,35 @@ public class GateKeeperServiceTest {
         List<Visitors> visitorList=new ArrayList<>();
         Visitors visitor=new Visitors();
         visitor.setVisitorId(1);
-        visitor.setName("Sam");
+        visitor.setVisitorName("Sam");
         visitor.setAadhar(1234567890L);
-        visitor.setPhone(35467890L);
         visitor.setDate(date);
         visitor.setPass("azsxdcfgvh");
         visitor.setAdditionalInfo("description");
-        visitor.setHouseNumber(10);
-        visitor.setResident(new Resident());
+        visitor.setResidenceId(10);
+        visitor.setHasCheckedIn(true);
+        visitor.setIsApproved("approved");
         visitorList.add(visitor);
 
-        GateKeeper gateKeeper = new GateKeeper();
-        gateKeeper.setGatekeeper_id(1);
-        gateKeeper.setGateId(1);
-        gateKeeper.setActive(true);
-        gateKeeper.setGatekeeperName("Babu");
-        gateKeeper.setAadhar(3456789L);
-        gateKeeper.setPhone_number(1324567890L);
-        gateKeeper.setVisitorsList(new ArrayList<>());
+        Users user =new Users();
+        user.setUserName("itsMathi");
+        user.setActive(true);
+
+        when(customUserDetailsService.getCurrentUserName()).thenReturn("itsMathi");
+        when(userRepository.findByUserName("itsMathi")).thenReturn(Optional.of(user));
+        when(gateKeeperService.isGateKeeperBlacklisted("itsMathi")).thenReturn(false);
 
         List<Visitor> visitors=new ArrayList<>();
         Visitor visitorObject=new Visitor();
         visitorObject.setVisitorId(1);
         visitorObject.setVisitorName("Sam");
         visitorObject.setResidenceId(10);
-
+        visitorObject.setHasCheckedIn(true);
+        visitorObject.setIsApproved("approved");
         visitors.add(visitorObject);
-        when(jwtTokenProvider.getUsername(tokenString)).thenReturn("Babu");
+
         when(visitorRepository.findByDate(date)).thenReturn(visitorList);
-        when(gateKeeperRepository.findByGatekeeperName("Babu")).thenReturn(gateKeeper);
-        when(blacklistRepository.existsByAadhar(gateKeeper.getAadhar())).thenReturn(false);
-        List<Visitor> response=gateKeeperService.getVisitorsList(date,token);
+        List<Visitor> response=gateKeeperService.getVisitorsList(date);
         assertEquals(visitors,response);
     }
 
@@ -101,27 +103,32 @@ public class GateKeeperServiceTest {
         String token="Bearer aDszfxdgcfh";
         String tokenString= "aDszfxdgcfh";
 
-        GateKeeper gateKeeper = new GateKeeper();
-        gateKeeper.setGatekeeper_id(1);
-        gateKeeper.setGateId(1);
-        gateKeeper.setActive(true);
-        gateKeeper.setGatekeeperName("Babu");
-        gateKeeper.setAadhar(3456789L);
-        gateKeeper.setPhone_number(1324567890L);
-        gateKeeper.setVisitorsList(new ArrayList<>());
+        Users user =new Users();
+        user.setUserName("itsMathi");
+        user.setActive(true);
 
-        when(jwtTokenProvider.getUsername(tokenString)).thenReturn("Babu");
-        when(gateKeeperRepository.findByGatekeeperName("Babu")).thenReturn(gateKeeper);
-        when(blacklistRepository.existsByAadhar(gateKeeper.getAadhar())).thenReturn(false);
+        Roles roles=new Roles();
+        roles.setRoleId(1);
+        roles.setRoleName("resident");
+
 
         BlackListRequest blackListRequest=new BlackListRequest();
         blackListRequest.setAadhar(435678L);
         blackListRequest.setUserType("visitor");
 
-        String message="Added user to blacklist";
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("resident"));
 
-        String response= gateKeeperService.blacklistVisitor(blackListRequest,token);
-        assertEquals(message,response);
+         
+        when(customUserDetailsService.getCurrentUserName()).thenReturn("itsMathi");
+        when(blacklistRepository.existsByAadhar(blackListRequest.getAadhar())).thenReturn(false);
+        when(gateKeeperService.canBlacklist("resident",blackListRequest.getUserType())).thenReturn(true);
+        when(customUserDetailsService.getCurrentUserRole().toString()).thenReturn(authorities.toString());
+        BlackListResponse blackListResponse=new BlackListResponse();
+        blackListResponse.setMessage("Added user to blacklist");
+
+        BlackListResponse response= gateKeeperService.blacklistVisitor(blackListRequest);
+        assertEquals(blackListResponse,response);
 
     }
 
@@ -131,100 +138,126 @@ public class GateKeeperServiceTest {
 
     @Test
     public void testBlackListVisitorError() {
-        String token="aDszfxdgcfh";
         BlackListRequest blackListRequest = new BlackListRequest();
         blackListRequest.setAadhar(435678L);
-        blackListRequest.setUserType("visitor23");
-        String message = "Added to blackList";
-        assertThrows(RuntimeException.class,()->gateKeeperService.blacklistVisitor(blackListRequest,token));
+        blackListRequest.setUserType("visitor");
+        Users user =new Users();
+        user.setUserName("itsMathi");
+        user.setAadhar(435678L);
+        user.setActive(true);
+        when(blacklistRepository.existsByAadhar(user.getAadhar())).thenReturn(true);
+        when(userRepository.findByUserName("itsMathi")).thenReturn(Optional.of(user));
+        when(customUserDetailsService.getCurrentUserName()).thenReturn("itsMathi");
+        when(gateKeeperService.isGateKeeperBlacklisted("itsMathi")).thenReturn(true);
+        assertThrows(RuntimeException.class,()->gateKeeperService.blacklistVisitor(blackListRequest));
     }
+
+
 
     /**
      * Unit test for approveVisitor success scenario
      */
     @Test
     public void testApproveVisitor(){
-        String token="Bearer aDszfxdgcfh";
-        String tokenString= "aDszfxdgcfh";
+        int visitorId=1;
+        String pass="cgvhbjn";
+        Users user =new Users();
+        user.setUserName("itsMathi");
+        user.setActive(true);
+        user.setAadhar(1234567890L);
 
-        GateKeeper gateKeeper = new GateKeeper();
-        gateKeeper.setGatekeeper_id(1);
-        gateKeeper.setGateId(1);
-        gateKeeper.setActive(true);
-        gateKeeper.setGatekeeperName("Babu");
-        gateKeeper.setAadhar(3456789L);
-        gateKeeper.setPhone_number(1324567890L);
-        gateKeeper.setVisitorsList(new ArrayList<>());
+        when(customUserDetailsService.getCurrentUserName()).thenReturn("itsMathi");
+        when(userRepository.findByUserName("itsMathi")).thenReturn(Optional.of(user));
+        when(gateKeeperService.isGateKeeperBlacklisted("itsMathi")).thenReturn(false);
 
-        when(jwtTokenProvider.getUsername(tokenString)).thenReturn("Babu");
-        when(gateKeeperRepository.findByGatekeeperName("Babu")).thenReturn(gateKeeper);
-        when(blacklistRepository.existsByAadhar(gateKeeper.getAadhar())).thenReturn(false);
 
         Visitors visitor=new Visitors();
         visitor.setVisitorId(1);
-        visitor.setName("Sam");
+        visitor.setVisitorName("Sam");
         visitor.setAadhar(1234567890L);
         visitor.setPhone(35467890L);
         visitor.setDate(LocalDate.of(2023,4,3));
-        visitor.setPass("azsxdcfgvh");
+        visitor.setPass(pass);
         visitor.setAdditionalInfo("description");
-        visitor.setHouseNumber(10);
-        visitor.setResident(new Resident());
+        visitor.setResidenceId(10);
 
         when(visitorRepository.findById(1)).thenReturn(Optional.of(visitor));
-        when(gateKeeperRepository.findById(1)).thenReturn(Optional.of(gateKeeper));
+        when (blacklistRepository.existsByAadhar(1234567890L)).thenReturn(false);
 
-        GateKeeperApprovalRequest approvalRequest=new GateKeeperApprovalRequest();
-        approvalRequest.setPass("azsxdcfgvh");
-        approvalRequest.setGatekeeperId(1);
 
-        String response= gateKeeperService.approveVisitor(1,approvalRequest,token);
-        assertEquals("Approved the visitor",response);
+
+        ApprovedVisitorResponse approvedVisitorResponse=new ApprovedVisitorResponse();
+       approvedVisitorResponse.setMessage("Approved the visitor");
+
+       ApprovedVisitorResponse response= gateKeeperService.approveVisitor(1,pass);
+        assertEquals(approvedVisitorResponse,response);
 
     }
 
     /**
-     * Unit test for approveVisitor failure scenario
+     * Unit test for approveVisitor success scenario
      */
-
     @Test
     public void testRejectVisitor(){
-        String token="Bearer aDszfxdgcfh";
-        String tokenString= "aDszfxdgcfh";
+        int visitorId=1;
+        String pass="cgvhbj";
+        Users user =new Users();
+        user.setUserName("itsMathi");
+        user.setActive(true);
+        user.setAadhar(1234567890L);
 
-        GateKeeper gateKeeper = new GateKeeper();
-        gateKeeper.setGatekeeper_id(1);
-        gateKeeper.setGateId(1);
-        gateKeeper.setActive(true);
-        gateKeeper.setGatekeeperName("Babu");
-        gateKeeper.setAadhar(3456789L);
-        gateKeeper.setPhone_number(1324567890L);
-        gateKeeper.setVisitorsList(new ArrayList<>());
+        when(customUserDetailsService.getCurrentUserName()).thenReturn("itsMathi");
+        when(userRepository.findByUserName("itsMathi")).thenReturn(Optional.of(user));
+        when(gateKeeperService.isGateKeeperBlacklisted("itsMathi")).thenReturn(false);
 
-        when(jwtTokenProvider.getUsername(tokenString)).thenReturn("Babu");
-        when(gateKeeperRepository.findByGatekeeperName("Babu")).thenReturn(gateKeeper);
-        when(blacklistRepository.existsByAadhar(gateKeeper.getAadhar())).thenReturn(false);
 
         Visitors visitor=new Visitors();
         visitor.setVisitorId(1);
-        visitor.setName("Sam");
+        visitor.setVisitorName("Sam");
         visitor.setAadhar(1234567890L);
         visitor.setPhone(35467890L);
         visitor.setDate(LocalDate.of(2023,4,3));
-        visitor.setPass("azsxdcfgvh");
+        visitor.setPass(pass);
         visitor.setAdditionalInfo("description");
-        visitor.setHouseNumber(10);
-        visitor.setResident(new Resident());
+        visitor.setResidenceId(10);
 
         when(visitorRepository.findById(1)).thenReturn(Optional.of(visitor));
-        when(gateKeeperRepository.findById(1)).thenReturn(Optional.of(gateKeeper));
+        when (blacklistRepository.existsByAadhar(1234567890L)).thenReturn(false);
 
-        GateKeeperApprovalRequest approvalRequest=new GateKeeperApprovalRequest();
-        approvalRequest.setPass("azsxdcfgvkjch");
-        approvalRequest.setGatekeeperId(1);
 
-        String response= gateKeeperService.approveVisitor(1,approvalRequest,token);
-        assertEquals("Rejected the visitor",response);
+
+        ApprovedVisitorResponse approvedVisitorResponse=new ApprovedVisitorResponse();
+        approvedVisitorResponse.setMessage("Rejected the visitor");
+
+        ApprovedVisitorResponse response= gateKeeperService.approveVisitor(1,"dsfghj");
+        assertEquals(approvedVisitorResponse,response);
 
     }
+    /**
+     * Unit test for view resident
+     */
+    @Test
+    public void testViewResident(){
+        Users user=new Users();
+        user.setUserId(1);
+        user.setFirstName("Mathi");
+        user.setLastName("Krish");
+        user.setResidenceNumber(10);
+        user.setPhoneNumber(3546789L);
+        user.setActive(true);
+
+        when(userRepository.findById(1)).thenReturn(Optional.of(user));
+
+        ResidentGateKeeperResponse response=new ResidentGateKeeperResponse();
+        response.setResidenceId(user.getResidenceNumber());
+        response.setResidentName(user.getFirstName()+" "+user.getLastName());
+        response.setPhoneNumber(user.getPhoneNumber());
+
+        ResidentGateKeeperResponse response1= gateKeeperService.viewResident(1);
+        assertEquals(response,response1);
+
+
+
+    }
+
 }

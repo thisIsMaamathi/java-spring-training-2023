@@ -1,5 +1,6 @@
 package cdw.springtraining.gatekeeper.service;
 
+import cdw.springtraining.gatekeeper.constant.CommonConstants;
 import cdw.springtraining.gatekeeper.entites.Visitors;
 import cdw.springtraining.gatekeeper.exceptions.UserNotFoundException;
 import cdw.springtraining.gatekeeper.models.ScheduleResponse;
@@ -30,16 +31,16 @@ public class VisitorService {
         if (visitor != null) {
             ScheduleResponse response = new ScheduleResponse();
             response.setVisitorId(visitor.getVisitorId());
-            response.setName(visitor.getName());
+            response.setName(visitor.getVisitorName());
             response.setDate(visitor.getDate());
             response.setAadhar(visitor.getAadhar());
             response.setAdditionalInformation(visitor.getAdditionalInfo());
             response.setPhone(visitor.getPhone());
             response.setPass(visitor.getPass());
-            response.setResidenceId(visitor.getHouseNumber());
+            response.setResidenceId(visitor.getResidenceId());
             return response;
 
         } else
-            throw new UserNotFoundException("Visitor Not Found");
+            throw new UserNotFoundException(CommonConstants.VISITOR_NOT_FOUND);
     }
 }

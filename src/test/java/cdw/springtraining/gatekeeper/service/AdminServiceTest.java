@@ -4,6 +4,8 @@ import cdw.springtraining.gatekeeper.entites.*;
 import cdw.springtraining.gatekeeper.exceptions.UserAlreadyExistsException;
 import cdw.springtraining.gatekeeper.models.*;
 import cdw.springtraining.gatekeeper.repository.*;
+import cdw.springtraining.gatekeeper.security.CustomUserDetailsService;
+import org.hibernate.sql.Update;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -24,18 +27,17 @@ public class AdminServiceTest {
 
     @InjectMocks
     AdminService adminService;
+
     @Mock
-    ResidentRepository residentRepository;
-    @Mock
-    BlacklistRepository blacklistRepository;
-    @Mock
-    GateKeeperRepository gateKeeperRepository;
-    @Mock
-    ApproveRequestRepository approveRequestRepository;
+    BlackListRepository blacklistRepository;
+
     @Mock
     UserRepository userRepository;
     @Mock
-    RoleRepository roleRepository;
+    RolesRepository roleRepository;
+
+    @Mock
+    CustomUserDetailsService customUserDetailsService;
 
     /**
      * Unit testing for getAllResidents
@@ -43,100 +45,61 @@ public class AdminServiceTest {
 
     @Test
     public void testGetAllResidents() {
-        List<Resident> residentList = new ArrayList<>();
-        List<ResidentObject> residentObject = new ArrayList<>();
+        List<Users> residentList = new ArrayList<>();
+        List<ResidentAdminResponse> residentObject = new ArrayList<>();
 
-        Resident resident1 = new Resident();
-        resident1.setId(1);
-        resident1.setResidentName("Mathi");
+       Users resident1 = new Users();
+       resident1.setUserId(1);
+        resident1.setUserName("itsMathi");
+        resident1.setFirstName("Mathi");
+        resident1.setLastName("mathi");
         resident1.setResidenceNumber(10);
         resident1.setPhoneNumber(123456789L);
         resident1.setActive(true);
         resident1.setAadhar(23456789L);
+        resident1.setActive(true);
+        resident1.setIsApproved("approved");
         resident1.setVisitorsList(new ArrayList<>());
 
         residentList.add(resident1);
 
 
-        ResidentObject residentObject1 = new ResidentObject();
-        residentObject1.setId(1);
+       ResidentAdminResponse residentObject1 = new ResidentAdminResponse();
+        residentObject1.setUserId(1);
         residentObject1.setResidenceId(10);
-        residentObject1.setResidentName("Mathi");
+        residentObject1.setResidentName("Mathi mathi");
+        residentObject1.setUserName("itsMathi");
         residentObject1.setPhoneNumber(123456789L);
         residentObject1.setAadhar(23456789L);
-
+        residentObject1.setIsActive(true);
+        residentObject1.setIsApproved("approved");
         residentObject.add(residentObject1);
 
 
-        when(residentRepository.findByIsActive(true)).thenReturn(residentList);
-        List<ResidentObject> response = adminService.getAllResidents();
+        when(userRepository.findByUserTypeAndIsActive("resident",true)).thenReturn(residentList);
+        List<ResidentAdminResponse> response = adminService.getAllResidents();
         assertEquals(residentObject, response);
 
     }
 
-    /**
-     * Unit test for create resident
-     */
-    @Test
-    public void testCreateNewResident() {
-        CreateResident request = new CreateResident();
-        request.setAadhar(3456789L);
-        request.setResidenceId(10);
-        request.setPhoneNumber(1324567890L);
-        request.setResidentName("Rose");
-        when(residentRepository.existsByResidenceNumber(request.getResidenceId())).thenReturn(false);
-        Resident resident = new Resident();
-        resident.setId(1);
-        resident.setResidenceNumber(10);
-        resident.setActive(true);
-        resident.setResidentName("Rose");
-        resident.setAadhar(3456789L);
-        resident.setPhoneNumber(1324567890L);
-        resident.setVisitorsList(new ArrayList<>());
-
-        ResidentObject residentObject = new ResidentObject();
-        residentObject.setId(1);
-        residentObject.setResidenceId(10);
-        residentObject.setResidentName("Rose");
-        residentObject.setPhoneNumber(1324567890L);
-        residentObject.setAadhar(3456789L);
-
-        when(residentRepository.findByAadharAndResidenceNumber(request.getAadhar(),request.getResidenceId())).thenReturn(resident);
-        ResidentObject response = adminService.createNewResident(request);
-        assertEquals(residentObject, response);
-    }
-
-    /**
-     * Unit test for exceptin in create new resident
-     */
-    @Test
-    public void testUserExceptionForCreateResident() {
-        CreateResident request = new CreateResident();
-        request.setAadhar(3456789L);
-        request.setResidenceId(10);
-        request.setPhoneNumber(1324567890L);
-        request.setResidentName("Rose");
-        when(residentRepository.existsByResidenceNumber(10)).thenReturn(true);
-        assertThrows(UserAlreadyExistsException.class, () -> adminService.createNewResident(request));
-    }
 
     /**
      * Unit testing for deleteResident
      */
     @Test
-    public void testDeleteResident() {
-        Resident resident = new Resident();
-        resident.setId(1);
+    public void testDeleteUser() {
+        Users resident=new Users();
+        resident.setUserId(1);
         resident.setResidenceNumber(10);
         resident.setActive(true);
-        resident.setResidentName("Rose");
+        resident.setUserName("Rose");
         resident.setAadhar(3456789L);
         resident.setPhoneNumber(1324567890L);
         resident.setVisitorsList(new ArrayList<>());
 
-        when(residentRepository.findById(1)).thenReturn(Optional.of(resident));
-        String b = adminService.deleteResident(1);
-        assertEquals("Deleted Resident Rose of residenceId 10" ,b);
+        when(userRepository.findById(1)).thenReturn(Optional.of(resident));
+         adminService.deleteUser(1);
+        verify(userRepository).findById(1);
 
     }
 
@@ -144,30 +107,33 @@ public class AdminServiceTest {
      * Unit tes for updateResident
      */
     @Test
-    public void testUpdateResident() {
-        UpdateResident request = new UpdateResident();
+    public void testUpdateUser() {
+        UpdateUserRequest request=new UpdateUserRequest();
         request.setAadhar(3456789L);
-        request.setResidentName("Rose");
+        request.setUserName("Rose");
         request.setPhoneNumber(1324567890L);
 
-        Resident resident = new Resident();
-        resident.setId(1);
+        Users resident = new Users();
+        resident.setUserId(1);
         resident.setResidenceNumber(10);
         resident.setActive(true);
-        resident.setResidentName("Rose");
+        resident.setUserName("Rose");
         resident.setAadhar(3456789L);
         resident.setPhoneNumber(1324567890L);
+        resident.setIsApproved("approved");
         resident.setVisitorsList(new ArrayList<>());
-        when(residentRepository.findById(1)).thenReturn(Optional.of(resident));
+        when(userRepository.findById(1)).thenReturn(Optional.of(resident));
 
-        ResidentObject residentObject = new ResidentObject();
-        residentObject.setId(1);
+        UserAdminResponse residentObject = new UserAdminResponse();
+        residentObject.setUserId(1);
         residentObject.setResidenceId(10);
-        residentObject.setResidentName("Rose");
+        residentObject.setUserName("Rose");
         residentObject.setPhoneNumber(1324567890L);
         residentObject.setAadhar(3456789L);
+        residentObject.setIsActive(true);
+        residentObject.setIsApproved("approved");
 
-        ResidentObject response = adminService.updateResident(1, request);
+       UserAdminResponse response = adminService.updateUser(1, request);
         assertEquals(residentObject, response);
 
     }
@@ -176,291 +142,114 @@ public class AdminServiceTest {
      * Unit test for getByResidentId
      */
     @Test
-    public void testGetResidentById() {
+    public void testUsersById() {
 
-        Resident resident = new Resident();
-        resident.setId(1);
+        Users resident = new Users();
+        resident.setUserId(1);
         resident.setResidenceNumber(10);
         resident.setActive(true);
-        resident.setResidentName("Rose");
+        resident.setUserName("Rose");
+        resident.setFirstName("Rosie");
+        resident.setLastName("mary");
         resident.setAadhar(3456789L);
         resident.setPhoneNumber(1324567890L);
+        resident.setIsApproved("approved");
         resident.setVisitorsList(new ArrayList<>());
 
-        when(residentRepository.findById(1)).thenReturn(Optional.of(resident));
-        ResidentObject residentObject = new ResidentObject();
-        residentObject.setId(1);
+        when(userRepository.findById(1)).thenReturn(Optional.of(resident));
+        UserAdminResponse residentObject = new UserAdminResponse();
+        residentObject.setUserId(1);
         residentObject.setResidenceId(10);
-        residentObject.setResidentName("Rose");
+        residentObject.setUserName("Rose");
+        residentObject.setName("Rosie mary");
         residentObject.setPhoneNumber(1324567890L);
         residentObject.setAadhar(3456789L);
+        residentObject.setIsActive(true);
+        residentObject.setIsApproved("approved");
 
-        ResidentObject response = adminService.getResidentById(1);
+        UserAdminResponse response = adminService.getUsersById(1);
         assertEquals(residentObject, response);
 
     }
 
 
-    /**
-     * Unit test for createNewGateKeeper
-     */
-    @Test
-    public void testCreateNewGateKeepers() {
-        CreateGateKeeper request = new CreateGateKeeper();
-        request.setAadhar(3456789L);
-        request.setGateKeeperName("Babu");
-        request.setPhoneNumber(1324567890L);
-        when(gateKeeperRepository.existsByAadhar(request.getAadhar())).thenReturn(false);
 
-        GateKeeper gateKeeper = new GateKeeper();
-        gateKeeper.setGatekeeper_id(1);
-        gateKeeper.setGateId(1);
-        gateKeeper.setActive(true);
-        gateKeeper.setGatekeeperName("Babu");
-        gateKeeper.setAadhar(3456789L);
-        gateKeeper.setPhone_number(1324567890L);
-        gateKeeper.setVisitorsList(new ArrayList<>());
-
-        GateKeeperObject gateKeeperObject = new GateKeeperObject();
-        gateKeeperObject.setId(1);
-        gateKeeperObject.setGateId(1);
-        gateKeeperObject.setGateKeeperName("Babu");
-        gateKeeperObject.setPhoneNumber(1324567890L);
-        gateKeeperObject.setAadhar(3456789L);
-
-        when(gateKeeperRepository.findByAadhar(request.getAadhar())).thenReturn(gateKeeper);
-
-        GateKeeperObject response = adminService.createNewGateKeeper(request);
-        assertEquals(gateKeeperObject, response);
-
-
-    }
-
-    /**
-     * Unit testing for deleteAGatekeeper
-     */
-
-    @Test
-    public void testDeleteGateKeeper() {
-        GateKeeper gateKeeper = new GateKeeper();
-        gateKeeper.setGatekeeper_id(1);
-        gateKeeper.setGateId(1);
-        gateKeeper.setActive(true);
-        gateKeeper.setGatekeeperName("Babu");
-        gateKeeper.setAadhar(3456789L);
-        gateKeeper.setPhone_number(1324567890L);
-        gateKeeper.setVisitorsList(new ArrayList<>());
-
-        when(gateKeeperRepository.findById(1)).thenReturn(Optional.of(gateKeeper));
-        String b = adminService.deleteAGatekeeper(1);
-        assertEquals("The gatekeeper Babu has been deleted", b);
-
-    }
 
     /**
      * Unit testing for getAllGateKeepers
      */
     @Test
     public void testGetAllGateKeepers() {
-        List<GateKeeper> gateKeepersList = new ArrayList<>();
-        List<GateKeeperObject> gateKeeperObjects = new ArrayList<>();
+        List<Users> gateKeepersList = new ArrayList<>();
+        List<GateKeeperAdminResponse> gateKeeperObjects = new ArrayList<>();
 
-        GateKeeper gateKeeper = new GateKeeper();
-        gateKeeper.setGatekeeper_id(1);
-        gateKeeper.setGateId(1);
+        Users gateKeeper = new Users();
+        gateKeeper.setUserId(1);
         gateKeeper.setActive(true);
-        gateKeeper.setGatekeeperName("Babu");
+        gateKeeper.setUserName("Babu");
+        gateKeeper.setFirstName("Babu");
+        gateKeeper.setLastName("lal");
+        gateKeeper.setUserType("gatekeeper");
+        gateKeeper.setIsApproved("approved");
+        gateKeeper.setActive(true);
         gateKeeper.setAadhar(3456789L);
-        gateKeeper.setPhone_number(1324567890L);
+        gateKeeper.setPhoneNumber(1324567890L);
         gateKeeper.setVisitorsList(new ArrayList<>());
-
-
         gateKeepersList.add(gateKeeper);
 
-        GateKeeperObject gateKeeperObject = new GateKeeperObject();
-        gateKeeperObject.setId(1);
-        gateKeeperObject.setGateId(1);
-        gateKeeperObject.setGateKeeperName("Babu");
+       GateKeeperAdminResponse gateKeeperObject = new GateKeeperAdminResponse();
+        gateKeeperObject.setUserId(1);
+        gateKeeperObject.setUserName("Babu");
+        gateKeeperObject.setName("Babu lal");
         gateKeeperObject.setPhoneNumber(1324567890L);
         gateKeeperObject.setAadhar(3456789L);
+        gateKeeperObject.setIsApproved("approved");
+        gateKeeperObject.setIsActive(true);
 
 
         gateKeeperObjects.add(gateKeeperObject);
 
 
-        when(gateKeeperRepository.findByIsActive(true)).thenReturn(gateKeepersList);
-        List<GateKeeperObject> response = adminService.getAllGateKeepers();
+        when(userRepository.findByUserTypeAndIsActive("gatekeeper",true)).thenReturn(gateKeepersList);
+        List<GateKeeperAdminResponse> response = adminService.getAllGateKeepers();
         assertEquals(gateKeeperObjects, response);
 
     }
 
-    /**
-     * Unit test for  getAGateKeeper
-     */
-
-    @Test
-    public void testGetGateKeeperById() {
-        GateKeeper gateKeeper = new GateKeeper();
-        gateKeeper.setGatekeeper_id(1);
-        gateKeeper.setGateId(1);
-        gateKeeper.setActive(true);
-        gateKeeper.setGatekeeperName("Babu");
-        gateKeeper.setAadhar(3456789L);
-        gateKeeper.setPhone_number(1324567890L);
-        gateKeeper.setVisitorsList(new ArrayList<>());
-
-        when(gateKeeperRepository.findById(1)).thenReturn(Optional.of(gateKeeper));
-        GateKeeperObject gateKeeperObject = new GateKeeperObject();
-        gateKeeperObject.setId(1);
-        gateKeeperObject.setGateId(1);
-        gateKeeperObject.setGateKeeperName("Babu");
-        gateKeeperObject.setPhoneNumber(1324567890L);
-        gateKeeperObject.setAadhar(3456789L);
-
-        GateKeeperObject response = adminService.getAGateKeeper(1);
-        assertEquals(gateKeeperObject, response);
-
-    }
-
-    /**
-     * Unit for updateGateKeeper
-     */
-
-    @Test
-    public void testUpdateGateKeeper() {
-        UpdateGateKeeper request = new UpdateGateKeeper();
-        request.setAadhar(3456789L);
-        request.setGateKeeperName("Babu");
-        request.setPhoneNumber(1324567890L);
-
-        GateKeeper gateKeeper = new GateKeeper();
-        gateKeeper.setGatekeeper_id(1);
-        gateKeeper.setGateId(1);
-        gateKeeper.setActive(true);
-        gateKeeper.setGatekeeperName("Babu");
-        gateKeeper.setAadhar(3456789L);
-        gateKeeper.setPhone_number(1324567890L);
-        gateKeeper.setVisitorsList(new ArrayList<>());
-        when(gateKeeperRepository.findById(1)).thenReturn(Optional.of(gateKeeper));
-
-        ResidentObject residentObject = new ResidentObject();
-        GateKeeperObject gateKeeperObject = new GateKeeperObject();
-        gateKeeperObject.setId(1);
-        gateKeeperObject.setGateId(1);
-        gateKeeperObject.setGateKeeperName("Babu");
-        gateKeeperObject.setPhoneNumber(1324567890L);
-        gateKeeperObject.setAadhar(3456789L);
-
-        GateKeeperObject response = adminService.updateGateKeeper(1, request);
-        assertEquals(gateKeeperObject, response);
-
-    }
 
     /**
      * Unit test for approveRequest
      */
 
     @Test
-    public void testApproveRequestResident() {
-        UserObject userObject = new UserObject();
+    public void testApproveRequest() {
+        UserResponse userObject = new UserResponse();
         userObject.setUserType("resident");
         userObject.setAadhar(3456789L);
         userObject.setUserId(1);
         userObject.setPhoneNumber(345678890L);
         userObject.setUserName("Maya");
+        userObject.setIsApproved("approved");
+        userObject.setIsActive(true);
+        userObject.setResidenceId(10);
 
-        ApproveRequest approveRequest = new ApproveRequest();
-        approveRequest.setRequestId(1);
+        Users approveRequest = new Users();
+        approveRequest.setUserId(1);
         approveRequest.setPhoneNumber(345678890L);
-        approveRequest.setHasApproved(true);
         approveRequest.setAadhar(3456789L);
         approveRequest.setResidenceNumber(10);
         approveRequest.setUserName("Maya");
         approveRequest.setPassword("pass");
         approveRequest.setUserType("resident");
 
-        when(approveRequestRepository.findById(1)).thenReturn(Optional.of(approveRequest));
+        when(userRepository.findById(1)).thenReturn(Optional.of(approveRequest));
+        when(customUserDetailsService.getCurrentUserName()).thenReturn("itsMathi");
 
-
-        Roles role = new Roles();
-        role.setRoleId(1);
-        role.setRoleName("resident");
-        role.setUserList(new ArrayList<>());
-
-        User user = new User();
-        user.setUser_id(1);
-        user.setUserName("Maya");
-        user.setRoles(new ArrayList<>());
-
-        when(roleRepository.findByRoleName(approveRequest.getUserType())).thenReturn(role);
-        when(residentRepository.existsByResidenceNumber(approveRequest.getResidenceNumber())).thenReturn(false);
-        when(userRepository.findByUserName(approveRequest.getUserName())).thenReturn(Optional.of(user));
-        Resident resident = new Resident();
-        resident.setId(1);
-        resident.setResidenceNumber(10);
-        resident.setActive(true);
-        resident.setResidentName("Rose");
-        resident.setAadhar(3456789L);
-        resident.setPhoneNumber(1324567890L);
-        resident.setVisitorsList(new ArrayList<>());
-
-        UserObject userObjectResponse = adminService.approveRequest(1);
+        UserResponse userObjectResponse = adminService.approveRequest(1);
         assertEquals(userObject, userObjectResponse);
 
     }
 
-    /**
-     * Unit tes for approveRequest
-     */
-    @Test
-    public void testApproveRequestGateKeeper() {
-        UserObject userObject = new UserObject();
-        userObject.setUserType("gatekeeper");
-        userObject.setAadhar(3456789L);
-        userObject.setUserId(1);
-        userObject.setPhoneNumber(345678890L);
-        userObject.setUserName("Maya");
-
-        ApproveRequest approveRequest = new ApproveRequest();
-        approveRequest.setRequestId(1);
-        approveRequest.setPhoneNumber(345678890L);
-        approveRequest.setHasApproved(true);
-        approveRequest.setAadhar(3456789L);
-        approveRequest.setResidenceNumber(10);
-        approveRequest.setUserName("Maya");
-        approveRequest.setPassword("pass");
-        approveRequest.setUserType("gatekeeper");
-
-        when(approveRequestRepository.findById(1)).thenReturn(Optional.of(approveRequest));
-
-
-        Roles role = new Roles();
-        role.setRoleId(1);
-        role.setRoleName("gatekeeper");
-        role.setUserList(new ArrayList<>());
-
-        User user = new User();
-        user.setUser_id(1);
-        user.setUserName("Maya");
-        user.setRoles(new ArrayList<>());
-
-        when(roleRepository.findByRoleName(approveRequest.getUserType())).thenReturn(role);
-        when(gateKeeperRepository.existsByAadhar(approveRequest.getAadhar())).thenReturn(false);
-        //when(residentRepository.existsByResidenceNumber(approveRequest.getResidenceNumber())).thenReturn(false);
-        when(userRepository.findByUserName(approveRequest.getUserName())).thenReturn(Optional.of(user));
-        GateKeeper gateKeeper = new GateKeeper();
-        gateKeeper.setGatekeeper_id(1);
-        gateKeeper.setGateId(1);
-        gateKeeper.setActive(true);
-        gateKeeper.setGatekeeperName("Babu");
-        gateKeeper.setAadhar(3456789L);
-        gateKeeper.setPhone_number(1324567890L);
-        gateKeeper.setVisitorsList(new ArrayList<>());
-
-        UserObject userObjectResponse = adminService.approveRequest(1);
-        assertEquals(userObject, userObjectResponse);
-
-    }
 
     /**
      * Unit test for viewRegistrationRequests
@@ -468,32 +257,134 @@ public class AdminServiceTest {
     @Test
     public void viewRegnReqTest() {
 
-        List<ApproveRequest> approveRequestList = new ArrayList<>();
-        ApproveRequest approveRequest = new ApproveRequest();
-        approveRequest.setRequestId(1);
+        List<Users> approveRequestList = new ArrayList<>();
+        Users approveRequest = new Users();
+        approveRequest.setUserId(1);
         approveRequest.setPhoneNumber(345678890L);
-        approveRequest.setHasApproved(true);
+        approveRequest.setIsApproved("approved");
         approveRequest.setAadhar(3456789L);
-        approveRequest.setResidenceNumber(10);
         approveRequest.setUserName("Maya");
         approveRequest.setPassword("pass");
+        approveRequest.setResidenceNumber(10);
         approveRequest.setUserType("gatekeeper");
-        approveRequest.setHasApproved(false);
+        approveRequest.setActive(true);
         approveRequestList.add(approveRequest);
 
-        List<UserObject> userObjectsList = new ArrayList<>();
-        UserObject userObject = new UserObject();
+        List<UserResponse> userObjectsList = new ArrayList<>();
+        UserResponse userObject = new UserResponse();
         userObject.setUserType("gatekeeper");
         userObject.setAadhar(3456789L);
         userObject.setUserId(1);
         userObject.setPhoneNumber(345678890L);
         userObject.setUserName("Maya");
+        userObject.setIsActive(true);
+        userObject.setIsApproved("approved");
+        userObject.setResidenceId(10);
         userObjectsList.add(userObject);
 
-        when(approveRequestRepository.findAll()).thenReturn(approveRequestList);
-        List<UserObject> response = adminService.viewRegistrationRequests();
+        when(userRepository.findByIsActive(true)).thenReturn(approveRequestList);
+        List<UserResponse> response = adminService.viewApprovedRequests();
         assertEquals(response, userObjectsList);
 
+
+    }
+
+    @Test
+    public void viewRequestRejectedTest() {
+
+        List<Users> approveRequestList = new ArrayList<>();
+        Users approveRequest = new Users();
+        approveRequest.setUserId(1);
+        approveRequest.setPhoneNumber(345678890L);
+        approveRequest.setIsApproved("rejected");
+        approveRequest.setAadhar(3456789L);
+        approveRequest.setUserName("Maya");
+        approveRequest.setPassword("pass");
+        approveRequest.setResidenceNumber(10);
+        approveRequest.setUserType("gatekeeper");
+        approveRequest.setActive(true);
+        approveRequestList.add(approveRequest);
+
+        List<UserResponse> userObjectsList = new ArrayList<>();
+        UserResponse userObject = new UserResponse();
+        userObject.setUserType("gatekeeper");
+        userObject.setAadhar(3456789L);
+        userObject.setUserId(1);
+        userObject.setPhoneNumber(345678890L);
+        userObject.setUserName("Maya");
+        userObject.setIsActive(true);
+        userObject.setIsApproved("rejected");
+        userObject.setResidenceId(10);
+        userObjectsList.add(userObject);
+
+        when(userRepository.findByIsApproved("rejected")).thenReturn(approveRequestList);
+        List<UserResponse> response = adminService.viewRequestRejected();
+        assertEquals(response, userObjectsList);
+
+
+    }
+
+    @Test
+    public void viewRequestApprovedTest() {
+
+        List<Users> approveRequestList = new ArrayList<>();
+        Users approveRequest = new Users();
+        approveRequest.setUserId(1);
+        approveRequest.setPhoneNumber(345678890L);
+        approveRequest.setIsApproved("approved");
+        approveRequest.setAadhar(3456789L);
+        approveRequest.setUserName("Maya");
+        approveRequest.setPassword("pass");
+        approveRequest.setResidenceNumber(10);
+        approveRequest.setUserType("gatekeeper");
+        approveRequest.setActive(true);
+        approveRequestList.add(approveRequest);
+
+        List<UserResponse> userObjectsList = new ArrayList<>();
+        UserResponse userObject = new UserResponse();
+        userObject.setUserType("gatekeeper");
+        userObject.setAadhar(3456789L);
+        userObject.setUserId(1);
+        userObject.setPhoneNumber(345678890L);
+        userObject.setUserName("Maya");
+        userObject.setIsActive(true);
+        userObject.setIsApproved("approved");
+        userObject.setResidenceId(10);
+        userObjectsList.add(userObject);
+
+        when(userRepository.findByIsApproved("approved")).thenReturn(approveRequestList);
+        List<UserResponse> response = adminService.viewRequestApproved();
+        assertEquals(response, userObjectsList);
+
+
+    }
+
+    @Test
+    public void testRejectRequest() {
+        UserResponse userObject = new UserResponse();
+        userObject.setUserType("resident");
+        userObject.setAadhar(3456789L);
+        userObject.setUserId(1);
+        userObject.setPhoneNumber(345678890L);
+        userObject.setUserName("Maya");
+        userObject.setIsApproved("rejected");
+        userObject.setIsActive(true);
+        userObject.setResidenceId(10);
+
+        Users approveRequest = new Users();
+        approveRequest.setUserId(1);
+        approveRequest.setPhoneNumber(345678890L);
+        approveRequest.setAadhar(3456789L);
+        approveRequest.setResidenceNumber(10);
+        approveRequest.setUserName("Maya");
+        approveRequest.setPassword("pass");
+        approveRequest.setUserType("resident");
+
+        when(userRepository.findById(1)).thenReturn(Optional.of(approveRequest));
+        when(customUserDetailsService.getCurrentUserName()).thenReturn("itsMathi");
+
+        UserResponse userObjectResponse = adminService.rejectUser(1);
+        assertEquals(userObject, userObjectResponse);
 
     }
 

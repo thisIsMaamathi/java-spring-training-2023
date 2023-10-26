@@ -33,10 +33,15 @@ public class Blacklist {
 
     @Column(name = "user_type")
     @NotNull(message = "UserType cannot be blank")
-    private String user_type;
+    private String userType;
 
-    public Blacklist(Long aadhar, String user_type) {
+    @Column(name="added_by")
+    @NotNull(message="added by cannot be null")
+    private String addedBy;
+
+    public Blacklist(Long aadhar, String userType,String addedBy) {
         this.aadhar = aadhar;
-        this.user_type = user_type;
+        this.userType = userType;
+        this.addedBy=addedBy;
     }
 }

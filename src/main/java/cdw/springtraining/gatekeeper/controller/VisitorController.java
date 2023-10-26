@@ -1,6 +1,6 @@
 package cdw.springtraining.gatekeeper.controller;
 
-import cdw.springtraining.gatekeeper.api.VisitorsApi;
+import cdw.springtraining.gatekeeper.api.VisitorApi;
 import cdw.springtraining.gatekeeper.models.ScheduleResponse;
 import cdw.springtraining.gatekeeper.service.VisitorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Controller for Visitor operations
  */
 @RestController
-public class VisitorController implements VisitorsApi {
+public class VisitorController implements VisitorApi {
     VisitorService visitorService;
     @Autowired
     public VisitorController(VisitorService visitorService) {

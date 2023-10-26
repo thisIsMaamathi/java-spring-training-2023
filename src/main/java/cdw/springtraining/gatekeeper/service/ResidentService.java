@@ -2,7 +2,7 @@ package cdw.springtraining.gatekeeper.service;
 
 import cdw.springtraining.gatekeeper.constant.CommonConstants;
 import cdw.springtraining.gatekeeper.entites.Blacklist;
-import cdw.springtraining.gatekeeper.entites.Resident;
+import cdw.springtraining.gatekeeper.entites.Users;
 import cdw.springtraining.gatekeeper.entites.Visitors;
 import cdw.springtraining.gatekeeper.exceptions.BlackListedUserException;
 import cdw.springtraining.gatekeeper.exceptions.UserAlreadyExistsException;
@@ -10,12 +10,15 @@ import cdw.springtraining.gatekeeper.exceptions.UserNotFoundException;
 import cdw.springtraining.gatekeeper.models.BlackListRequest;
 import cdw.springtraining.gatekeeper.models.ScheduleRequest;
 import cdw.springtraining.gatekeeper.models.ScheduleResponse;
-import cdw.springtraining.gatekeeper.repository.BlacklistRepository;
-import cdw.springtraining.gatekeeper.repository.GateKeeperRepository;
-import cdw.springtraining.gatekeeper.repository.ResidentRepository;
+import cdw.springtraining.gatekeeper.repository.BlackListRepository;
+import cdw.springtraining.gatekeeper.repository.UserRepository;
 import cdw.springtraining.gatekeeper.repository.VisitorRepository;
+import cdw.springtraining.gatekeeper.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -24,17 +27,19 @@ import java.util.UUID;
 @Service
 public class ResidentService {
 
-    ResidentRepository residentRepository;
+
+    BlackListRepository blacklistRepository;
+    UserRepository userRepository;
     VisitorRepository visitorRepository;
-    GateKeeperRepository gateKeeperRepository;
-    BlacklistRepository blacklistRepository;
+
+    CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    public ResidentService(ResidentRepository residentRepository, VisitorRepository visitorRepository, GateKeeperRepository gateKeeperRepository, BlacklistRepository blacklistRepository) {
-        this.residentRepository = residentRepository;
-        this.visitorRepository = visitorRepository;
-        this.gateKeeperRepository = gateKeeperRepository;
+    public ResidentService(BlackListRepository blacklistRepository, UserRepository userRepository, VisitorRepository visitorRepository, CustomUserDetailsService customUserDetailsService) {
         this.blacklistRepository = blacklistRepository;
+        this.userRepository = userRepository;
+        this.visitorRepository = visitorRepository;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     /**
@@ -45,34 +50,41 @@ public class ResidentService {
      */
 
     public ScheduleResponse scheduleVisit(ScheduleRequest request) {
-        Resident resident = residentRepository.findById(request.getResidentId()).orElseThrow(() -> new UserNotFoundException(CommonConstants.RESIDENT_NOT_FOUND));
+        String principal = customUserDetailsService.getCurrentUserName();
+        Users resident = userRepository.findByUserName(principal).orElseThrow(() -> new UserNotFoundException(CommonConstants.RESIDENT_NOT_FOUND));
+
         if (blacklistRepository.existsByAadhar(request.getAadhar()))
             throw new BlackListedUserException(CommonConstants.BLACKLISTED_VISITOR);
-        if (visitorRepository.existsByAadharAndDateAndHouseNumber(request.getAadhar(), request.getDate(), resident.getResidenceNumber()))
-            throw new UserAlreadyExistsException(CommonConstants.VISIT_ALREADY_SCHEDULED);
 
-        Visitors visitor = new Visitors(request.getName(), request.getDate(), request.getAadhar(), request.getPhone(), request.getAdditionalInformation());
+      if(visitorRepository.existsByAadharAndDateAndResidenceId(request.getAadhar(),request.getDate(),request.getResidenceId()))
+          throw new UserAlreadyExistsException(CommonConstants.VISIT_ALREADY_SCHEDULED);
+
+
+
+        Visitors visitor = new Visitors(request.getVisitorName(), request.getDate(), request.getAadhar(), request.getPhone(), request.getAdditionalInformation(),request.getResidenceId());
         visitor.setPass(generatePass());
-        visitor.setResident(resident);
-        visitor.setHouseNumber(resident.getResidenceNumber());
+        visitor.getUsersList().add(resident);
         visitorRepository.save(visitor);
 
-        Visitors visitors = visitorRepository.findByAadhar(request.getAadhar());
-        ScheduleResponse scheduleResponse = new ScheduleResponse();
-        scheduleResponse.setVisitorId(visitors.getVisitorId());
-        scheduleResponse.setName(visitor.getName());
-        scheduleResponse.setAadhar(visitor.getAadhar());
-        scheduleResponse.setDate(visitor.getDate());
-        scheduleResponse.setPhone(visitor.getPhone());
-        scheduleResponse.setAdditionalInformation(visitor.getAdditionalInfo());
-        scheduleResponse.setResidenceId(resident.getResidenceNumber());
-        scheduleResponse.setPass(visitors.getPass());
-        return scheduleResponse;
+        Optional<Visitors> visitorsOptional = visitorRepository.findByAadharAndDateAndResidenceId(request.getAadhar(), request.getDate(),request.getResidenceId());
+        if(visitorsOptional.isEmpty()) throw new RuntimeException(CommonConstants.USER_NOT_FOUND);
+        Visitors visitors=visitorsOptional.get();
+            ScheduleResponse scheduleResponse = new ScheduleResponse();
+            scheduleResponse.setVisitorId(visitors.getVisitorId());
+            scheduleResponse.setName(visitors.getVisitorName());
+            scheduleResponse.setAadhar(visitors.getAadhar());
+            scheduleResponse.setDate(visitors.getDate());
+            scheduleResponse.setPhone(visitors.getPhone());
+            scheduleResponse.setAdditionalInformation(visitors.getAdditionalInfo());
+            scheduleResponse.setResidenceId(visitors.getResidenceId());
+            scheduleResponse.setPass(visitors.getPass());
+            return scheduleResponse;
 
     }
 
     /**
      * Method to genrate a pass
+     *
      * @return Pass as a string
      */
     public String generatePass() {
@@ -81,27 +93,18 @@ public class ResidentService {
 
     /**
      * Method to cancel a visit
+     *
      * @param visitorId
-     * @return  String with appropriate response
+     * @return String with appropriate response
      */
     public String cancelVisit(int visitorId) {
+
         Visitors visitor = visitorRepository.findById(visitorId).orElseThrow(() -> new UserNotFoundException(CommonConstants.VISITOR_NOT_FOUND));
+        if(visitor.isHasCheckedIn()) throw new RuntimeException(CommonConstants.VISITOR_ALREADY_ENTERED);
         visitorRepository.delete(visitor);
         return CommonConstants.CANCELLED_VISIT;
     }
 
-    /**
-     * Method to blacklist a user
-     * @param blackListRequest
-     * @return String with appropriate messagex
-     */
-    public String blacklistUser(BlackListRequest blackListRequest) {
-        if (blackListRequest.getUserType().equalsIgnoreCase("visitor") || blackListRequest.getUserType().equalsIgnoreCase("gatekeeper")) {
-            Blacklist blacklist = new Blacklist(blackListRequest.getAadhar(), blackListRequest.getUserType());
-            blacklistRepository.save(blacklist);
-            return CommonConstants.ADDED_TO_BLACKLIST;
-        } else
-            throw new UserNotFoundException(CommonConstants.USER_TYPE_MISMATCH);
-    }
+
 }
 

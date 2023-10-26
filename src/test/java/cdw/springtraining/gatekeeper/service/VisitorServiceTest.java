@@ -1,6 +1,5 @@
 package cdw.springtraining.gatekeeper.service;
 
-import cdw.springtraining.gatekeeper.entites.Resident;
 import cdw.springtraining.gatekeeper.entites.Visitors;
 import cdw.springtraining.gatekeeper.models.ScheduleResponse;
 import cdw.springtraining.gatekeeper.repository.VisitorRepository;
@@ -45,14 +44,14 @@ public class VisitorServiceTest {
 
         Visitors visitor = new Visitors();
         visitor.setVisitorId(1);
-        visitor.setName("Jack");
+        visitor.setVisitorName("Jack");
         visitor.setAadhar(123456789L);
         visitor.setPhone(9876543210L);
         visitor.setDate(LocalDate.of(2023, 3, 4));
         visitor.setPass("aDszfxgchv");
         visitor.setAdditionalInfo("desc");
-        visitor.setHouseNumber(10);
-        visitor.setResident(new Resident());
+        visitor.setResidenceId(10);
+
 
         when(visitorRepository.findByPass("aDszfxgchv")).thenReturn(visitor);
         ScheduleResponse response = visitorService.getVisitorDetails("aDszfxgchv");

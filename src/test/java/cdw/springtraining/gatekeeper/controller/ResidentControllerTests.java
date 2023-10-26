@@ -11,6 +11,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 /**
@@ -35,7 +36,7 @@ public class ResidentControllerTests {
         ScheduleRequest request=new ScheduleRequest();
 
         when(residentService.scheduleVisit(request)).thenReturn(scheduleResponse);
-        ScheduleResponse response=residentController.schedule(request).getBody();
+        ScheduleResponse response=residentController.scheduleVisitorEntry(request).getBody();
         assertEquals(scheduleResponse,response);
     }
 
@@ -46,22 +47,10 @@ public class ResidentControllerTests {
     @Test
     public void testCancelVisitor(){
         Integer id=1;
-        when(residentService.cancelVisit(1)).thenReturn("Cancelled this scheduled visit");
-        ResponseEntity<String> response = residentController.cancelVisitor(1);
-        assertEquals("Cancelled this scheduled visit",response.getBody());
+        Void response = residentController.cancelVisitor(1).getBody();
+        assertEquals(null,response);
 
     }
 
-    /**
-     * Unit testing for resident blacklist
-     */
-    @Test
-    public void testResidentBlackList(){
-        BlackListRequest request=new BlackListRequest();
-        when(residentService.blacklistUser(request)).thenReturn("Blacklisted");
-        String response=residentController.residentBlacklist(request).getBody();
-        assertEquals("Blacklisted",response);
-
-    }
 
 }

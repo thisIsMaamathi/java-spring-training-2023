@@ -36,6 +36,6 @@ public class Roles {
     @Column(name = "role_name")
     private String roleName;
 
-    @ManyToMany(mappedBy = "roles", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private List<User> userList = new ArrayList<>();
+    @ManyToMany(mappedBy = "rolesList", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<Users> userList = new ArrayList<>();
 }

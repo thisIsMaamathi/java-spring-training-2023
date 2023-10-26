@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 /**
  * BlackListRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-26T16:12:55.335364+05:30[Asia/Kolkata]")
 public class BlackListRequest   {
   @JsonProperty("aadhar")
   private Long aadhar;

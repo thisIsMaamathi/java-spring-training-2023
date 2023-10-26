@@ -5,9 +5,16 @@
  */
 package cdw.springtraining.gatekeeper.api;
 
+import cdw.springtraining.gatekeeper.models.ApprovedVisitorResponse;
+import cdw.springtraining.gatekeeper.models.BadRequestError;
 import cdw.springtraining.gatekeeper.models.BlackListRequest;
-import cdw.springtraining.gatekeeper.models.GateKeeperApprovalRequest;
+import cdw.springtraining.gatekeeper.models.BlackListResponse;
+import cdw.springtraining.gatekeeper.models.ForbiddenError;
+import cdw.springtraining.gatekeeper.models.InternalServerError;
 import java.time.LocalDate;
+import cdw.springtraining.gatekeeper.models.NotFoundError;
+import cdw.springtraining.gatekeeper.models.ResidentGateKeeperResponse;
+import cdw.springtraining.gatekeeper.models.UnauthorizedError;
 import cdw.springtraining.gatekeeper.models.Visitor;
 import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
@@ -23,61 +30,123 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-26T16:12:55.335364+05:30[Asia/Kolkata]")
 @Validated
-@Api(value = "GateKeeper", description = "the GateKeeper API")
-public interface GateKeeperApi {
+@Api(value = "Gatekeeper", description = "the Gatekeeper API")
+public interface GatekeeperApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * PUT /gateKeeper/approve/{visitorId} : allows Gatekeeper to approve a visitor
+     * PATCH /gatekeeper/approve/{visitorId} : allows Gatekeeper to approve a visitor
      *
      * @param visitorId  (required)
-     * @param token  (required)
-     * @param gateKeeperApprovalRequest  (required)
-     * @return Approved the vistor (status code 200)
-     *         or Internal Server Error (status code 500)
+     * @param pass  (required)
+     * @return 200 OK (status code 200)
+     *         or 400 BAD REQUEST (status code 400)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
+     *         or 404 NOT FOUND (status code 404)
      */
-    @ApiOperation(value = "allows Gatekeeper to approve a visitor", nickname = "approveVisitor", notes = "", response = String.class, tags={ "GateKeeper", })
+    @ApiOperation(value = "allows Gatekeeper to approve a visitor", nickname = "approveVisitor", notes = "", response = ApprovedVisitorResponse.class, tags={ "gatekeeper", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Approved the vistor", response = String.class),
-        @ApiResponse(code = 500, message = "Internal Server Error") })
+        @ApiResponse(code = 200, message = "200 OK", response = ApprovedVisitorResponse.class),
+        @ApiResponse(code = 400, message = "400 BAD REQUEST", response = BadRequestError.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class),
+        @ApiResponse(code = 404, message = "404 NOT FOUND", response = NotFoundError.class) })
     @RequestMapping(
-        method = RequestMethod.PUT,
-        value = "/gateKeeper/approve/{visitorId}",
-        produces = { "application/json" },
-        consumes = { "application/json" }
+        method = RequestMethod.PATCH,
+        value = "/gatekeeper/approve/{visitorId}",
+        produces = { "application/json" }
     )
-    default ResponseEntity<String> approveVisitor(@ApiParam(value = "", required = true) @PathVariable("visitorId") Integer visitorId,@ApiParam(value = "", required = true) @RequestHeader(value = "token", required = true) String token,@ApiParam(value = "", required = true) @Valid @RequestBody GateKeeperApprovalRequest gateKeeperApprovalRequest) {
+    default ResponseEntity<ApprovedVisitorResponse> approveVisitor(@ApiParam(value = "", required = true) @PathVariable("visitorId") Integer visitorId,@NotNull @ApiParam(value = "", required = true) @Valid @RequestParam(value = "pass", required = true) String pass) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
 
 
     /**
-     * POST /gatekeeper/blacklist : Blacklist a visitor
+     * POST /blacklist : Blacklist a person
      *
-     * @param token  (required)
      * @param blackListRequest  (required)
-     * @return Added to blacklist (status code 200)
-     *         or Visitor not found (status code 404)
-     *         or Internal Server (status code 500)
+     * @return 201 CREATED (status code 201)
+     *         or 400 BAD REQUEST (status code 400)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
      */
-    @ApiOperation(value = "Blacklist a visitor", nickname = "gatekeeperBlacklist", notes = "", response = String.class, tags={ "GateKeeper", })
+    @ApiOperation(value = "Blacklist a person", nickname = "blacklist", notes = "", response = BlackListResponse.class, tags={ "gatekeeper","resident", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Added to blacklist", response = String.class),
-        @ApiResponse(code = 404, message = "Visitor not found"),
-        @ApiResponse(code = 500, message = "Internal Server") })
+        @ApiResponse(code = 201, message = "201 CREATED", response = BlackListResponse.class),
+        @ApiResponse(code = 400, message = "400 BAD REQUEST", response = BadRequestError.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class) })
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/gatekeeper/blacklist",
+        value = "/blacklist",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<String> gatekeeperBlacklist(@ApiParam(value = "", required = true) @RequestHeader(value = "token", required = true) String token,@ApiParam(value = "", required = true) @Valid @RequestBody BlackListRequest blackListRequest) {
+    default ResponseEntity<BlackListResponse> blacklist(@ApiParam(value = "", required = true) @Valid @RequestBody BlackListRequest blackListRequest) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /gatekeeper/view/{userId} : To display a List of all residents
+     *
+     * @param userId  (required)
+     * @return 200 OK (status code 200)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
+     */
+    @ApiOperation(value = "To display a List of all residents", nickname = "getUserGateKeeperView", notes = "", response = ResidentGateKeeperResponse.class, tags={ "gatekeeper", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "200 OK", response = ResidentGateKeeperResponse.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class) })
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/gatekeeper/view/{userId}",
+        produces = { "application/json" }
+    )
+    default ResponseEntity<ResidentGateKeeperResponse> getUserGateKeeperView(@ApiParam(value = "", required = true) @PathVariable("userId") Integer userId) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"phoneNumber\" : 6, \"residentName\" : \"residentName\", \"residenceId\" : 0 }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -87,26 +156,31 @@ public interface GateKeeperApi {
      * GET /gatekeeper/visitors : Get a list of visitors as per given date
      *
      * @param date  (required)
-     * @param token  (required)
-     * @return A List of all visitors visiting on that date (status code 200)
-     *         or Visitor not found (status code 404)
-     *         or Internal Server Error (status code 500)
+     * @return 200 OK (status code 200)
+     *         or 400 BAD REQUEST (status code 400)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
+     *         or 404 NOT FOUND (status code 404)
      */
-    @ApiOperation(value = "Get a list of visitors as per given date", nickname = "getVisitorsByDate", notes = "", response = Visitor.class, responseContainer = "List", tags={ "GateKeeper", })
+    @ApiOperation(value = "Get a list of visitors as per given date", nickname = "getVisitorsByDate", notes = "", response = Visitor.class, responseContainer = "List", tags={ "gatekeeper", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "A List of all visitors visiting on that date", response = Visitor.class, responseContainer = "List"),
-        @ApiResponse(code = 404, message = "Visitor not found"),
-        @ApiResponse(code = 500, message = "Internal Server Error") })
+        @ApiResponse(code = 200, message = "200 OK", response = Visitor.class, responseContainer = "List"),
+        @ApiResponse(code = 400, message = "400 BAD REQUEST", response = BadRequestError.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class),
+        @ApiResponse(code = 404, message = "404 NOT FOUND", response = NotFoundError.class) })
     @RequestMapping(
         method = RequestMethod.GET,
         value = "/gatekeeper/visitors",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<Visitor>> getVisitorsByDate(@NotNull @ApiParam(value = "", required = true) @Valid @RequestParam(value = "date", required = true) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate date,@ApiParam(value = "", required = true) @RequestHeader(value = "token", required = true) String token) {
+    default ResponseEntity<List<Visitor>> getVisitorsByDate(@NotNull @ApiParam(value = "", required = true) @Valid @RequestParam(value = "date", required = true) @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) LocalDate date) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"visitorName\" : \"visitorName\", \"residenceId\" : 6, \"visitorId\" : 0 }";
+                    String exampleString = "{ \"visitorName\" : \"visitorName\", \"phoneNumber\" : 1, \"isApproved\" : \"isApproved\", \"residenceId\" : 6, \"hasCheckedIn\" : true, \"visitorId\" : 0 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

@@ -10,7 +10,6 @@ public class PhoneNumberValidator implements ConstraintValidator<ValidPhoneNumbe
     public void initialize(ValidPhoneNumber constraintAnnotation) {
         ConstraintValidator.super.initialize(constraintAnnotation);
     }
-
     /**
      * Validates the provided phone number.
      * @param phoneNumber

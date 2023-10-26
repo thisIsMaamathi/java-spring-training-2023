@@ -1,15 +1,19 @@
 package cdw.springtraining.gatekeeper.security;
 
-import cdw.springtraining.gatekeeper.entites.User;
+import cdw.springtraining.gatekeeper.entites.Users;
 import cdw.springtraining.gatekeeper.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,10 +38,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User user = (User) userRepository.findByUserName(username)
+        Users user = (Users) userRepository.findByUserName(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not exists by Username"));
 
-        Set<GrantedAuthority> authorities = user.getRoles().stream()
+        Set<GrantedAuthority> authorities = user.getRolesList().stream()
                 .map((role) -> new SimpleGrantedAuthority(role.getRoleName()))
                 .collect(Collectors.toSet());
 
@@ -47,6 +51,15 @@ public class CustomUserDetailsService implements UserDetailsService {
                 authorities
         );
 
+    }
+
+    public String getCurrentUserName(){
+        Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
+    }
+    public Collection<? extends GrantedAuthority> getCurrentUserRole(){
+        Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getAuthorities();
     }
 }
 

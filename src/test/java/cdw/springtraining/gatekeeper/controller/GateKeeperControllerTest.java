@@ -1,7 +1,5 @@
 package cdw.springtraining.gatekeeper.controller;
-import cdw.springtraining.gatekeeper.models.BlackListRequest;
-import cdw.springtraining.gatekeeper.models.GateKeeperApprovalRequest;
-import cdw.springtraining.gatekeeper.models.Visitor;
+import cdw.springtraining.gatekeeper.models.*;
 import cdw.springtraining.gatekeeper.service.GateKeeperService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,11 +34,8 @@ public class GateKeeperControllerTest {
     public void testGetVisitorsByDate(){
         LocalDate date = LocalDate.of(2023,3,3);
         List<Visitor> visitors=new ArrayList<>();
-        String token="vhbjn";
-
-
-        when(gateKeeperService.getVisitorsList(date,token)).thenReturn((List<Visitor>) visitors);
-        ResponseEntity<List<Visitor>> response= gateKeeperController.getVisitorsByDate(date,token);
+        when(gateKeeperService.getVisitorsList(date)).thenReturn(visitors);
+        ResponseEntity<List<Visitor>> response= gateKeeperController.getVisitorsByDate(date);
         assertEquals(visitors,response.getBody());
 
     }
@@ -51,10 +46,11 @@ public class GateKeeperControllerTest {
     @Test
     public void testGatekeeperBlacklist(){
         BlackListRequest request=new BlackListRequest();
-        String token="vhbjn";
-        when(gateKeeperService.blacklistVisitor(request,token)).thenReturn("Added to blacklist");
-        String response=gateKeeperController.gatekeeperBlacklist(token,request).getBody();
-        assertEquals("Added to blacklist",response);
+        BlackListResponse blacklistResponse=new BlackListResponse();
+
+        when(gateKeeperService.blacklistVisitor(request)).thenReturn(blacklistResponse);
+       BlackListResponse response= gateKeeperController.blacklist(request).getBody();
+        assertEquals(blacklistResponse,response);
 
     }
 
@@ -63,11 +59,23 @@ public class GateKeeperControllerTest {
      */
     @Test
     public void testApproveVisitor(){
-        GateKeeperApprovalRequest request=new GateKeeperApprovalRequest();
-        String token="vhbjn";
-        when(gateKeeperService.approveVisitor(1,request,token)).thenReturn("Approved visitor");
-        String response=gateKeeperController.approveVisitor(1,token,request).getBody();
-        assertEquals("Approved visitor",response);
+        ApprovedVisitorResponse approvedVisitorResponse=new ApprovedVisitorResponse();
+        String pass="vhbjn";
+        when(gateKeeperService.approveVisitor(1,pass)).thenReturn(approvedVisitorResponse);
+        ApprovedVisitorResponse response=gateKeeperController.approveVisitor(1,pass).getBody();
+        assertEquals(approvedVisitorResponse,response);
+    }
+
+    /**
+     * Unit testing for approveVisistors
+     */
+    @Test
+    public void testViewResident(){
+        ResidentGateKeeperResponse residentGateKeeperResponse=new ResidentGateKeeperResponse();
+
+        when(gateKeeperService.viewResident(1)).thenReturn(residentGateKeeperResponse);
+  ResidentGateKeeperResponse response=gateKeeperController.getUserGateKeeperView(1).getBody();
+        assertEquals(residentGateKeeperResponse,response);
     }
 
 

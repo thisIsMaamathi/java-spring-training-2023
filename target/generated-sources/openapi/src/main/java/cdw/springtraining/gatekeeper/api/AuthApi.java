@@ -5,8 +5,15 @@
  */
 package cdw.springtraining.gatekeeper.api;
 
+import cdw.springtraining.gatekeeper.models.BadRequestError;
+import cdw.springtraining.gatekeeper.models.ForbiddenError;
+import cdw.springtraining.gatekeeper.models.InternalServerError;
+import cdw.springtraining.gatekeeper.models.LoggingResponse;
 import cdw.springtraining.gatekeeper.models.LoginRequest;
+import cdw.springtraining.gatekeeper.models.NotFoundError;
 import cdw.springtraining.gatekeeper.models.RegistrationRequest;
+import cdw.springtraining.gatekeeper.models.RegistrationResponse;
+import cdw.springtraining.gatekeeper.models.UnauthorizedError;
 import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -21,7 +28,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-26T16:12:55.335364+05:30[Asia/Kolkata]")
 @Validated
 @Api(value = "Auth", description = "the Auth API")
 public interface AuthApi {
@@ -33,21 +40,36 @@ public interface AuthApi {
     /**
      * POST /register : allows a user to send registration request
      *
-     * @param registrationRequest  (optional)
-     * @return Appended request (status code 200)
-     *         or Internal Server Error (status code 500)
+     * @param registrationRequest  (required)
+     * @return 201 CREATED (status code 201)
+     *         or 400 BAD REQUEST (status code 400)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
      */
-    @ApiOperation(value = "allows a user to send registration request", nickname = "registerUser", notes = "", response = String.class, tags={ "Auth", })
+    @ApiOperation(value = "allows a user to send registration request", nickname = "registerUser", notes = "", response = RegistrationResponse.class, tags={ "auth", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Appended request", response = String.class),
-        @ApiResponse(code = 500, message = "Internal Server Error") })
+        @ApiResponse(code = 201, message = "201 CREATED", response = RegistrationResponse.class),
+        @ApiResponse(code = 400, message = "400 BAD REQUEST", response = BadRequestError.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class) })
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/register",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<String> registerUser(@ApiParam(value = "") @Valid @RequestBody(required = false) RegistrationRequest registrationRequest) {
+    default ResponseEntity<RegistrationResponse> registerUser(@ApiParam(value = "", required = true) @Valid @RequestBody RegistrationRequest registrationRequest) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -57,22 +79,37 @@ public interface AuthApi {
      * POST /login : Allow the user to login
      *
      * @param loginRequest  (required)
-     * @return Authenticated (status code 200)
-     *         or Unauthorized - Enter credentials correctly (status code 401)
-     *         or Forbidden,You dont have access (status code 403)
+     * @return 200 OK (status code 200)
+     *         or 400 BAD REQUEST (status code 400)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
+     *         or 404 NOT FOUND (status code 404)
      */
-    @ApiOperation(value = "Allow the user to login", nickname = "userLogin", notes = "", response = String.class, tags={ "Auth", })
+    @ApiOperation(value = "Allow the user to login", nickname = "userLogin", notes = "", response = LoggingResponse.class, tags={ "auth", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Authenticated", response = String.class),
-        @ApiResponse(code = 401, message = "Unauthorized - Enter credentials correctly"),
-        @ApiResponse(code = 403, message = "Forbidden,You dont have access") })
+        @ApiResponse(code = 200, message = "200 OK", response = LoggingResponse.class),
+        @ApiResponse(code = 400, message = "400 BAD REQUEST", response = BadRequestError.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class),
+        @ApiResponse(code = 404, message = "404 NOT FOUND", response = NotFoundError.class) })
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/login",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<String> userLogin(@ApiParam(value = "", required = true) @Valid @RequestBody LoginRequest loginRequest) {
+    default ResponseEntity<LoggingResponse> userLogin(@ApiParam(value = "", required = true) @Valid @RequestBody LoginRequest loginRequest) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -82,19 +119,36 @@ public interface AuthApi {
      * POST /logoff : Allow the user to log out
      *
      * @param token  (required)
-     * @return Logged out successfully (status code 200)
-     *         or Unauthorized - User is not authenticated (status code 401)
+     * @return 200 OK (status code 200)
+     *         or 400 BAD REQUEST (status code 400)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
+     *         or 404 NOT FOUND (status code 404)
      */
-    @ApiOperation(value = "Allow the user to log out", nickname = "userLogout", notes = "", response = String.class, tags={ "Auth", })
+    @ApiOperation(value = "Allow the user to log out", nickname = "userLogout", notes = "", response = LoggingResponse.class, tags={ "auth", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Logged out successfully", response = String.class),
-        @ApiResponse(code = 401, message = "Unauthorized - User is not authenticated") })
+        @ApiResponse(code = 200, message = "200 OK", response = LoggingResponse.class),
+        @ApiResponse(code = 400, message = "400 BAD REQUEST", response = BadRequestError.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class),
+        @ApiResponse(code = 404, message = "404 NOT FOUND", response = NotFoundError.class) })
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/logoff",
         produces = { "application/json" }
     )
-    default ResponseEntity<String> userLogout(@ApiParam(value = "", required = true) @RequestHeader(value = "token", required = true) String token) {
+    default ResponseEntity<LoggingResponse> userLogout(@ApiParam(value = "", required = true) @RequestHeader(value = "token", required = true) String token) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"message\" : \"message\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

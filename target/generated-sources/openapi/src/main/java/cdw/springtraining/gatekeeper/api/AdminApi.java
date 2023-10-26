@@ -5,13 +5,16 @@
  */
 package cdw.springtraining.gatekeeper.api;
 
-import cdw.springtraining.gatekeeper.models.CreateGateKeeper;
-import cdw.springtraining.gatekeeper.models.CreateResident;
-import cdw.springtraining.gatekeeper.models.GateKeeperObject;
-import cdw.springtraining.gatekeeper.models.ResidentObject;
-import cdw.springtraining.gatekeeper.models.UpdateGateKeeper;
-import cdw.springtraining.gatekeeper.models.UpdateResident;
-import cdw.springtraining.gatekeeper.models.UserObject;
+import cdw.springtraining.gatekeeper.models.BadRequestError;
+import cdw.springtraining.gatekeeper.models.ForbiddenError;
+import cdw.springtraining.gatekeeper.models.GateKeeperAdminResponse;
+import cdw.springtraining.gatekeeper.models.InternalServerError;
+import cdw.springtraining.gatekeeper.models.NotFoundError;
+import cdw.springtraining.gatekeeper.models.ResidentAdminResponse;
+import cdw.springtraining.gatekeeper.models.UnauthorizedError;
+import cdw.springtraining.gatekeeper.models.UpdateUserRequest;
+import cdw.springtraining.gatekeeper.models.UserAdminResponse;
+import cdw.springtraining.gatekeeper.models.UserResponse;
 import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,7 +29,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-17T13:15:27.851200+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-26T16:12:55.335364+05:30[Asia/Kolkata]")
 @Validated
 @Api(value = "Admin", description = "the Admin API")
 public interface AdminApi {
@@ -36,26 +39,32 @@ public interface AdminApi {
     }
 
     /**
-     * POST /requests/approve/{requestId} : Approve and save a user to database
+     * PATCH /requests/approve/{requestId} : Approve and save a user to database
      *
      * @param requestId  (required)
-     * @return Approved the user (status code 200)
-     *         or Internal Server Error (status code 500)
+     * @return 201 CREATED (status code 201)
+     *         or 400 BAD REQUEST (status code 400)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
      */
-    @ApiOperation(value = "Approve and save a user to database", nickname = "approveUser", notes = "", response = UserObject.class, tags={ "Admin", })
+    @ApiOperation(value = "Approve and save a user to database", nickname = "approveUser", notes = "", response = UserResponse.class, tags={ "admin", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Approved the user", response = UserObject.class),
-        @ApiResponse(code = 500, message = "Internal Server Error") })
+        @ApiResponse(code = 201, message = "201 CREATED", response = UserResponse.class),
+        @ApiResponse(code = 400, message = "400 BAD REQUEST", response = BadRequestError.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class) })
     @RequestMapping(
-        method = RequestMethod.POST,
+        method = RequestMethod.PATCH,
         value = "/requests/approve/{requestId}",
         produces = { "application/json" }
     )
-    default ResponseEntity<UserObject> approveUser(@ApiParam(value = "", required = true) @PathVariable("requestId") Integer requestId) {
+    default ResponseEntity<UserResponse> approveUser(@ApiParam(value = "", required = true) @PathVariable("requestId") Integer requestId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"phoneNumber\" : 1, \"aadhar\" : 6, \"userType\" : \"userType\", \"userName\" : \"userName\", \"userId\" : 0 }";
+                    String exampleString = "{ \"lastName\" : \"lastName\", \"gender\" : \"gender\", \"userName\" : \"userName\", \"isActive\" : true, \"userId\" : 0, \"residenceId\" : 5, \"firstName\" : \"firstName\", \"phoneNumber\" : 1, \"dob\" : \"2000-01-23\", \"aadhar\" : 6, \"userType\" : \"userType\", \"isApproved\" : \"isApproved\", \"email\" : \"email\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -67,116 +76,30 @@ public interface AdminApi {
 
 
     /**
-     * POST /gatekeepers : Create a new gatekeeper
+     * DELETE /user/{userId} : Delete a user by ID
      *
-     * @param createGateKeeper  (required)
-     * @return Created a GateKeeper (status code 201)
-     *         or Bad Request (invalid request payload) (status code 400)
-     *         or Internal Server Error (status code 500)
+     * @param userId  (required)
+     * @return Successful Deletion (status code 204)
+     *         or 400 BAD REQUEST (status code 400)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
+     *         or 404 NOT FOUND (status code 404)
      */
-    @ApiOperation(value = "Create a new gatekeeper", nickname = "createGateKeeper", notes = "", response = GateKeeperObject.class, tags={ "Admin", })
+    @ApiOperation(value = "Delete a user by ID", nickname = "deleteUsers", notes = "", tags={ "admin", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Created a GateKeeper", response = GateKeeperObject.class),
-        @ApiResponse(code = 400, message = "Bad Request (invalid request payload)"),
-        @ApiResponse(code = 500, message = "Internal Server Error") })
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/gatekeepers",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    default ResponseEntity<GateKeeperObject> createGateKeeper(@ApiParam(value = "", required = true) @Valid @RequestBody CreateGateKeeper createGateKeeper) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"phoneNumber\" : 5, \"gateId\" : 6, \"aadhar\" : 1, \"id\" : 0, \"gateKeeperName\" : \"gateKeeperName\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * POST /residents : Create a new resident
-     *
-     * @param createResident  (required)
-     * @return Created a resident (status code 201)
-     *         or Bad Request (invalid request payload) (status code 400)
-     *         or Internal Server Error (status code 500)
-     */
-    @ApiOperation(value = "Create a new resident", nickname = "createResidents", notes = "", response = ResidentObject.class, tags={ "Admin", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 201, message = "Created a resident", response = ResidentObject.class),
-        @ApiResponse(code = 400, message = "Bad Request (invalid request payload)"),
-        @ApiResponse(code = 500, message = "Internal Server Error") })
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/residents",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    default ResponseEntity<ResidentObject> createResidents(@ApiParam(value = "", required = true) @Valid @RequestBody CreateResident createResident) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"phoneNumber\" : 5, \"residentName\" : \"residentName\", \"aadhar\" : 1, \"id\" : 0, \"residenceId\" : 6 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * DELETE /gatekeepers/{gatekeeperId} : Delete a gateKeeper by ID
-     *
-     * @param gatekeeperId  (required)
-     * @return Successful deletion (status code 200)
-     *         or Resident not found (status code 404)
-     *         or Internal Server Error (status code 500)
-     */
-    @ApiOperation(value = "Delete a gateKeeper by ID", nickname = "deleteGateKeeper", notes = "", response = String.class, tags={ "Admin", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful deletion", response = String.class),
-        @ApiResponse(code = 404, message = "Resident not found"),
-        @ApiResponse(code = 500, message = "Internal Server Error") })
+        @ApiResponse(code = 204, message = "Successful Deletion"),
+        @ApiResponse(code = 400, message = "400 BAD REQUEST", response = BadRequestError.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class),
+        @ApiResponse(code = 404, message = "404 NOT FOUND", response = NotFoundError.class) })
     @RequestMapping(
         method = RequestMethod.DELETE,
-        value = "/gatekeepers/{gatekeeperId}",
+        value = "/user/{userId}",
         produces = { "application/json" }
     )
-    default ResponseEntity<String> deleteGateKeeper(@ApiParam(value = "", required = true) @PathVariable("gatekeeperId") Integer gatekeeperId) {
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * DELETE /residents/{residentId} : Delete a resident by ID
-     *
-     * @param residentId  (required)
-     * @return Successful Deletion (status code 200)
-     *         or Resident not found (status code 404)
-     *         or Internal Server Error (status code 500)
-     */
-    @ApiOperation(value = "Delete a resident by ID", nickname = "deleteResidents", notes = "", response = String.class, tags={ "Admin", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Successful Deletion", response = String.class),
-        @ApiResponse(code = 404, message = "Resident not found"),
-        @ApiResponse(code = 500, message = "Internal Server Error") })
-    @RequestMapping(
-        method = RequestMethod.DELETE,
-        value = "/residents/{residentId}",
-        produces = { "application/json" }
-    )
-    default ResponseEntity<String> deleteResidents(@ApiParam(value = "", required = true) @PathVariable("residentId") Integer residentId) {
+    default ResponseEntity<Void> deleteUsers(@ApiParam(value = "", required = true) @PathVariable("userId") Integer userId) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -185,21 +108,27 @@ public interface AdminApi {
     /**
      * GET /gatekeepers : To display a List of all gatekeepers
      *
-     * @return A List of all gatekeepers (status code 200)
+     * @return 200 OK (status code 200)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
      */
-    @ApiOperation(value = "To display a List of all gatekeepers", nickname = "getGateKeeper", notes = "", response = GateKeeperObject.class, responseContainer = "List", tags={ "Admin", })
+    @ApiOperation(value = "To display a List of all gatekeepers", nickname = "getGateKeeper", notes = "", response = GateKeeperAdminResponse.class, responseContainer = "List", tags={ "admin", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "A List of all gatekeepers", response = GateKeeperObject.class, responseContainer = "List") })
+        @ApiResponse(code = 200, message = "200 OK", response = GateKeeperAdminResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class) })
     @RequestMapping(
         method = RequestMethod.GET,
         value = "/gatekeepers",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<GateKeeperObject>> getGateKeeper() {
+    default ResponseEntity<List<GateKeeperAdminResponse>> getGateKeeper() {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"phoneNumber\" : 5, \"gateId\" : 6, \"aadhar\" : 1, \"id\" : 0, \"gateKeeperName\" : \"gateKeeperName\" }";
+                    String exampleString = "{ \"phoneNumber\" : 1, \"gender\" : \"gender\", \"dob\" : \"2000-01-23\", \"name\" : \"name\", \"aadhar\" : 6, \"userName\" : \"userName\", \"isActive\" : true, \"isApproved\" : \"isApproved\", \"userId\" : 0, \"email\" : \"email\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -213,21 +142,27 @@ public interface AdminApi {
     /**
      * GET /residents : To display a List of all residents
      *
-     * @return A List of all residents (status code 200)
+     * @return 200 OK (status code 200)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
      */
-    @ApiOperation(value = "To display a List of all residents", nickname = "getResidents", notes = "", response = ResidentObject.class, responseContainer = "List", tags={ "Admin", })
+    @ApiOperation(value = "To display a List of all residents", nickname = "getResidents", notes = "", response = ResidentAdminResponse.class, responseContainer = "List", tags={ "admin", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "A List of all residents", response = ResidentObject.class, responseContainer = "List") })
+        @ApiResponse(code = 200, message = "200 OK", response = ResidentAdminResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class) })
     @RequestMapping(
         method = RequestMethod.GET,
         value = "/residents",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<ResidentObject>> getResidents() {
+    default ResponseEntity<List<ResidentAdminResponse>> getResidents() {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"phoneNumber\" : 5, \"residentName\" : \"residentName\", \"aadhar\" : 1, \"id\" : 0, \"residenceId\" : 6 }";
+                    String exampleString = "{ \"phoneNumber\" : 5, \"gender\" : \"gender\", \"residentName\" : \"residentName\", \"dob\" : \"2000-01-23\", \"approvedBy\" : \"approvedBy\", \"aadhar\" : 1, \"userName\" : \"userName\", \"isActive\" : true, \"isApproved\" : \"isApproved\", \"userId\" : 0, \"residenceId\" : 6, \"email\" : \"email\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -239,26 +174,34 @@ public interface AdminApi {
 
 
     /**
-     * GET /residents/{residentId} : Get a resident by ID
+     * GET /user/{userId} : Get a user by ID
      *
-     * @param residentId  (required)
-     * @return The requested resident (status code 200)
-     *         or Resident not found (status code 404)
+     * @param userId  (required)
+     * @return 200 OK (status code 200)
+     *         or 400 BAD REQUEST (status code 400)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
+     *         or 404 NOT FOUND (status code 404)
      */
-    @ApiOperation(value = "Get a resident by ID", nickname = "getResidentsById", notes = "", response = ResidentObject.class, tags={ "Admin", })
+    @ApiOperation(value = "Get a user by ID", nickname = "getUserById", notes = "", response = UserAdminResponse.class, tags={ "admin", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "The requested resident", response = ResidentObject.class),
-        @ApiResponse(code = 404, message = "Resident not found") })
+        @ApiResponse(code = 200, message = "200 OK", response = UserAdminResponse.class),
+        @ApiResponse(code = 400, message = "400 BAD REQUEST", response = BadRequestError.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class),
+        @ApiResponse(code = 404, message = "404 NOT FOUND", response = NotFoundError.class) })
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/residents/{residentId}",
+        value = "/user/{userId}",
         produces = { "application/json" }
     )
-    default ResponseEntity<ResidentObject> getResidentsById(@ApiParam(value = "", required = true) @PathVariable("residentId") Integer residentId) {
+    default ResponseEntity<UserAdminResponse> getUserById(@ApiParam(value = "", required = true) @PathVariable("userId") Integer userId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"phoneNumber\" : 5, \"residentName\" : \"residentName\", \"aadhar\" : 1, \"id\" : 0, \"residenceId\" : 6 }";
+                    String exampleString = "{ \"gender\" : \"gender\", \"approvedBy\" : \"approvedBy\", \"userName\" : \"userName\", \"isActive\" : true, \"userId\" : 0, \"residenceId\" : 6, \"phoneNumber\" : 5, \"dob\" : \"2000-01-23\", \"name\" : \"name\", \"aadhar\" : 1, \"userType\" : \"userType\", \"isApproved\" : \"isApproved\", \"email\" : \"email\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -270,26 +213,32 @@ public interface AdminApi {
 
 
     /**
-     * GET /gatekeepers/{gatekeeperId} : Get a gateKeeper by ID
+     * PATCH /requests/reject/{requestId} : Approve and save a user to database
      *
-     * @param gatekeeperId  (required)
-     * @return The requested Gatekeeper has been retrived (status code 200)
-     *         or GateKeeper not found (status code 404)
+     * @param requestId  (required)
+     * @return 201 CREATED (status code 201)
+     *         or 400 BAD REQUEST (status code 400)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
      */
-    @ApiOperation(value = "Get a gateKeeper by ID", nickname = "getgateKeeperById", notes = "", response = GateKeeperObject.class, tags={ "Admin", })
+    @ApiOperation(value = "Approve and save a user to database", nickname = "rejectUser", notes = "", response = UserResponse.class, tags={ "admin", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "The requested Gatekeeper has been retrived", response = GateKeeperObject.class),
-        @ApiResponse(code = 404, message = "GateKeeper not found") })
+        @ApiResponse(code = 201, message = "201 CREATED", response = UserResponse.class),
+        @ApiResponse(code = 400, message = "400 BAD REQUEST", response = BadRequestError.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class) })
     @RequestMapping(
-        method = RequestMethod.GET,
-        value = "/gatekeepers/{gatekeeperId}",
+        method = RequestMethod.PATCH,
+        value = "/requests/reject/{requestId}",
         produces = { "application/json" }
     )
-    default ResponseEntity<GateKeeperObject> getgateKeeperById(@ApiParam(value = "", required = true) @PathVariable("gatekeeperId") Integer gatekeeperId) {
+    default ResponseEntity<UserResponse> rejectUser(@ApiParam(value = "", required = true) @PathVariable("requestId") Integer requestId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"phoneNumber\" : 5, \"gateId\" : 6, \"aadhar\" : 1, \"id\" : 0, \"gateKeeperName\" : \"gateKeeperName\" }";
+                    String exampleString = "{ \"lastName\" : \"lastName\", \"gender\" : \"gender\", \"userName\" : \"userName\", \"isActive\" : true, \"userId\" : 0, \"residenceId\" : 5, \"firstName\" : \"firstName\", \"phoneNumber\" : 1, \"dob\" : \"2000-01-23\", \"aadhar\" : 6, \"userType\" : \"userType\", \"isApproved\" : \"isApproved\", \"email\" : \"email\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -301,69 +250,72 @@ public interface AdminApi {
 
 
     /**
-     * PUT /gatekeepers/{gatekeeperId} : Update a GateKeeper by ID
+     * PUT /user/{userId} : Update a user by ID
      *
-     * @param gatekeeperId  (required)
-     * @param updateGateKeeper  (required)
-     * @return The updated GateKeeper (status code 200)
-     *         or Bad Request (invalid request payload) (status code 400)
-     *         or Resident not found (status code 404)
-     *         or Internal Server Error (status code 500)
-     */
-    @ApiOperation(value = "Update a GateKeeper by ID", nickname = "updateGateKeeper", notes = "", response = GateKeeperObject.class, tags={ "Admin", })
-    @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "The updated GateKeeper", response = GateKeeperObject.class),
-        @ApiResponse(code = 400, message = "Bad Request (invalid request payload)"),
-        @ApiResponse(code = 404, message = "Resident not found"),
-        @ApiResponse(code = 500, message = "Internal Server Error") })
-    @RequestMapping(
-        method = RequestMethod.PUT,
-        value = "/gatekeepers/{gatekeeperId}",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    default ResponseEntity<GateKeeperObject> updateGateKeeper(@ApiParam(value = "", required = true) @PathVariable("gatekeeperId") Integer gatekeeperId,@ApiParam(value = "", required = true) @Valid @RequestBody UpdateGateKeeper updateGateKeeper) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"phoneNumber\" : 5, \"gateId\" : 6, \"aadhar\" : 1, \"id\" : 0, \"gateKeeperName\" : \"gateKeeperName\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
-
-    /**
-     * PUT /residents/{residentId} : Update a resident by ID
-     *
-     * @param residentId  (required)
-     * @param updateResident  (required)
+     * @param userId  (required)
+     * @param updateUserRequest  (required)
      * @return The updated resident (status code 200)
-     *         or Bad Request (invalid request payload) (status code 400)
-     *         or Resident not found (status code 404)
-     *         or Internal Server Error (status code 500)
+     *         or 400 BAD REQUEST (status code 400)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
+     *         or 404 NOT FOUND (status code 404)
      */
-    @ApiOperation(value = "Update a resident by ID", nickname = "updateResidents", notes = "", response = ResidentObject.class, tags={ "Admin", })
+    @ApiOperation(value = "Update a user by ID", nickname = "updateUsers", notes = "", response = UserAdminResponse.class, tags={ "admin", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "The updated resident", response = ResidentObject.class),
-        @ApiResponse(code = 400, message = "Bad Request (invalid request payload)"),
-        @ApiResponse(code = 404, message = "Resident not found"),
-        @ApiResponse(code = 500, message = "Internal Server Error") })
+        @ApiResponse(code = 200, message = "The updated resident", response = UserAdminResponse.class),
+        @ApiResponse(code = 400, message = "400 BAD REQUEST", response = BadRequestError.class),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class),
+        @ApiResponse(code = 404, message = "404 NOT FOUND", response = NotFoundError.class) })
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/residents/{residentId}",
+        value = "/user/{userId}",
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<ResidentObject> updateResidents(@ApiParam(value = "", required = true) @PathVariable("residentId") Integer residentId,@ApiParam(value = "", required = true) @Valid @RequestBody UpdateResident updateResident) {
+    default ResponseEntity<UserAdminResponse> updateUsers(@ApiParam(value = "", required = true) @PathVariable("userId") Integer userId,@ApiParam(value = "", required = true) @Valid @RequestBody UpdateUserRequest updateUserRequest) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"phoneNumber\" : 5, \"residentName\" : \"residentName\", \"aadhar\" : 1, \"id\" : 0, \"residenceId\" : 6 }";
+                    String exampleString = "{ \"gender\" : \"gender\", \"approvedBy\" : \"approvedBy\", \"userName\" : \"userName\", \"isActive\" : true, \"userId\" : 0, \"residenceId\" : 6, \"phoneNumber\" : 5, \"dob\" : \"2000-01-23\", \"name\" : \"name\", \"aadhar\" : 1, \"userType\" : \"userType\", \"isApproved\" : \"isApproved\", \"email\" : \"email\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /requests/view/approved : View all the register requests made by users
+     *
+     * @return 200 OK (status code 200)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
+     *         or 404 NOT FOUND (status code 404)
+     */
+    @ApiOperation(value = "View all the register requests made by users", nickname = "viewApprovedRequest", notes = "", response = UserResponse.class, responseContainer = "List", tags={ "admin", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "200 OK", response = UserResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class),
+        @ApiResponse(code = 404, message = "404 NOT FOUND", response = NotFoundError.class) })
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/requests/view/approved",
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<UserResponse>> viewApprovedRequest() {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"lastName\" : \"lastName\", \"gender\" : \"gender\", \"userName\" : \"userName\", \"isActive\" : true, \"userId\" : 0, \"residenceId\" : 5, \"firstName\" : \"firstName\", \"phoneNumber\" : 1, \"dob\" : \"2000-01-23\", \"aadhar\" : 6, \"userType\" : \"userType\", \"isApproved\" : \"isApproved\", \"email\" : \"email\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -377,23 +329,65 @@ public interface AdminApi {
     /**
      * GET /requests/view : View all the register requests made by users
      *
-     * @return Approved the user (status code 200)
-     *         or Internal Server Error (status code 500)
+     * @return 200 OK (status code 200)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
+     *         or 404 NOT FOUND (status code 404)
      */
-    @ApiOperation(value = "View all the register requests made by users", nickname = "viewRegnRequest", notes = "", response = UserObject.class, responseContainer = "List", tags={ "Admin", })
+    @ApiOperation(value = "View all the register requests made by users", nickname = "viewRegnRequest", notes = "", response = UserResponse.class, responseContainer = "List", tags={ "admin", })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "Approved the user", response = UserObject.class, responseContainer = "List"),
-        @ApiResponse(code = 500, message = "Internal Server Error") })
+        @ApiResponse(code = 200, message = "200 OK", response = UserResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class),
+        @ApiResponse(code = 404, message = "404 NOT FOUND", response = NotFoundError.class) })
     @RequestMapping(
         method = RequestMethod.GET,
         value = "/requests/view",
         produces = { "application/json" }
     )
-    default ResponseEntity<List<UserObject>> viewRegnRequest() {
+    default ResponseEntity<List<UserResponse>> viewRegnRequest() {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"phoneNumber\" : 1, \"aadhar\" : 6, \"userType\" : \"userType\", \"userName\" : \"userName\", \"userId\" : 0 }";
+                    String exampleString = "{ \"lastName\" : \"lastName\", \"gender\" : \"gender\", \"userName\" : \"userName\", \"isActive\" : true, \"userId\" : 0, \"residenceId\" : 5, \"firstName\" : \"firstName\", \"phoneNumber\" : 1, \"dob\" : \"2000-01-23\", \"aadhar\" : 6, \"userType\" : \"userType\", \"isApproved\" : \"isApproved\", \"email\" : \"email\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /requests/view/rejected : View all the register requests made by users
+     *
+     * @return 200 OK (status code 200)
+     *         or 401 UNAUTHORIZED (status code 401)
+     *         or 500 INTERNAL SERVER ERROR (status code 500)
+     *         or 403 FORBIDDEN (status code 403)
+     *         or 404 NOT FOUND (status code 404)
+     */
+    @ApiOperation(value = "View all the register requests made by users", nickname = "viewRejectedRequest", notes = "", response = UserResponse.class, responseContainer = "List", tags={ "admin", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "200 OK", response = UserResponse.class, responseContainer = "List"),
+        @ApiResponse(code = 401, message = "401 UNAUTHORIZED", response = UnauthorizedError.class),
+        @ApiResponse(code = 500, message = "500 INTERNAL SERVER ERROR", response = InternalServerError.class),
+        @ApiResponse(code = 403, message = "403 FORBIDDEN", response = ForbiddenError.class),
+        @ApiResponse(code = 404, message = "404 NOT FOUND", response = NotFoundError.class) })
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/requests/view/rejected",
+        produces = { "application/json" }
+    )
+    default ResponseEntity<List<UserResponse>> viewRejectedRequest() {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"lastName\" : \"lastName\", \"gender\" : \"gender\", \"userName\" : \"userName\", \"isActive\" : true, \"userId\" : 0, \"residenceId\" : 5, \"firstName\" : \"firstName\", \"phoneNumber\" : 1, \"dob\" : \"2000-01-23\", \"aadhar\" : 6, \"userType\" : \"userType\", \"isApproved\" : \"isApproved\", \"email\" : \"email\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
