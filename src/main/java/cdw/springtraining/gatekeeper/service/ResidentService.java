@@ -1,13 +1,11 @@
 package cdw.springtraining.gatekeeper.service;
 
 import cdw.springtraining.gatekeeper.constant.CommonConstants;
-import cdw.springtraining.gatekeeper.entites.Blacklist;
 import cdw.springtraining.gatekeeper.entites.Users;
 import cdw.springtraining.gatekeeper.entites.Visitors;
 import cdw.springtraining.gatekeeper.exceptions.BlackListedUserException;
 import cdw.springtraining.gatekeeper.exceptions.UserAlreadyExistsException;
 import cdw.springtraining.gatekeeper.exceptions.UserNotFoundException;
-import cdw.springtraining.gatekeeper.models.BlackListRequest;
 import cdw.springtraining.gatekeeper.models.ScheduleRequest;
 import cdw.springtraining.gatekeeper.models.ScheduleResponse;
 import cdw.springtraining.gatekeeper.repository.BlackListRepository;
@@ -16,8 +14,6 @@ import cdw.springtraining.gatekeeper.repository.VisitorRepository;
 import cdw.springtraining.gatekeeper.security.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

@@ -2,18 +2,18 @@ package cdw.springtraining.gatekeeper.controller;
 
 
 import cdw.springtraining.gatekeeper.api.AdminApi;
-import cdw.springtraining.gatekeeper.models.*;
+import cdw.springtraining.gatekeeper.models.UserAdminResponse;
+import cdw.springtraining.gatekeeper.models.UserResponse;
+import cdw.springtraining.gatekeeper.models.ResidentAdminResponse;
+import cdw.springtraining.gatekeeper.models.GateKeeperAdminResponse;
 import cdw.springtraining.gatekeeper.service.AdminService;
-import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
-
 
 /**
  * Admin controller class consists of all endpoints accessible by admin.
@@ -66,20 +66,21 @@ public class AdminController implements AdminApi {
      * Endpoint for update user
      *
      * @param userId
-     * @return  userAdinResponse Response entity containing updated user
+     * @return userAdinResponse Response entity containing updated user
      */
     @Override
     public ResponseEntity<UserAdminResponse> updateUsers(@PathVariable Integer userId, @RequestBody UpdateUserRequest updateResident) {
-        return ResponseEntity.status(HttpStatus.OK).body(adminService.updateUser(userId,updateResident));
+        return ResponseEntity.status(HttpStatus.OK).body(adminService.updateUser(userId, updateResident));
 
     }
+
     /**
      * Endpoint for getting a resident by id
      *
      * @param userId
      * @return Response entity containing Resident Object
      */
-     @Override
+    @Override
     public ResponseEntity<UserAdminResponse> getUserById(@PathVariable Integer userId) {
         return ResponseEntity.status(HttpStatus.OK).body(adminService.getUsersById(userId));
     }
@@ -107,12 +108,13 @@ public class AdminController implements AdminApi {
 
     /**
      * Endpoint for rejecting a user
-     * @param requestId  (required)
+     *
+     * @param requestId (required)
      * @return user response
      */
     @Override
-   public ResponseEntity<UserResponse> rejectUser(@PathVariable("requestId") Integer requestId) {
-        return  ResponseEntity.status(200).body(adminService.rejectUser(requestId));
+    public ResponseEntity<UserResponse> rejectUser(@PathVariable("requestId") Integer requestId) {
+        return ResponseEntity.status(200).body(adminService.rejectUser(requestId));
     }
 
     /**
@@ -120,8 +122,8 @@ public class AdminController implements AdminApi {
      * @return List of user response
      */
     @Override
-   public ResponseEntity<List<UserResponse>> viewApprovedRequest(){
-        return  ResponseEntity.status(200).body(adminService.viewRequestApproved());
+    public ResponseEntity<List<UserResponse>> viewApprovedRequest() {
+        return ResponseEntity.status(200).body(adminService.viewRequestApproved());
     }
 
     /**
@@ -130,13 +132,9 @@ public class AdminController implements AdminApi {
      */
 
     @Override
-    public ResponseEntity<List<UserResponse>> viewRejectedRequest(){
-        return  ResponseEntity.status(200).body(adminService.viewRequestRejected());
+    public ResponseEntity<List<UserResponse>> viewRejectedRequest() {
+        return ResponseEntity.status(200).body(adminService.viewRequestRejected());
     }
-
-
-
-
 
 
 }

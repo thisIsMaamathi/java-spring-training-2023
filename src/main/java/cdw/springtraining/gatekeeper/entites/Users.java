@@ -2,7 +2,16 @@ package cdw.springtraining.gatekeeper.entites;
 
 import cdw.springtraining.gatekeeper.validation.ValidAadhar;
 import cdw.springtraining.gatekeeper.validation.ValidPhoneNumber;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.NotNull;

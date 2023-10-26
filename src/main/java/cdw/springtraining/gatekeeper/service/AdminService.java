@@ -6,7 +6,11 @@ import cdw.springtraining.gatekeeper.exceptions.NoEntriesException;
 import cdw.springtraining.gatekeeper.exceptions.UserAlreadyExistsException;
 import cdw.springtraining.gatekeeper.exceptions.UserHasBeenRemovedException;
 import cdw.springtraining.gatekeeper.exceptions.UserNotFoundException;
-import cdw.springtraining.gatekeeper.models.*;
+import cdw.springtraining.gatekeeper.models.UserResponse;
+import cdw.springtraining.gatekeeper.models.ResidentAdminResponse;
+import cdw.springtraining.gatekeeper.models.UpdateUserRequest;
+import cdw.springtraining.gatekeeper.models.UserAdminResponse;
+import cdw.springtraining.gatekeeper.models.GateKeeperAdminResponse;
 import cdw.springtraining.gatekeeper.repository.BlackListRepository;
 import cdw.springtraining.gatekeeper.repository.RolesRepository;
 import cdw.springtraining.gatekeeper.repository.UserRepository;
@@ -106,7 +110,7 @@ public class AdminService {
      */
 
     public List<UserResponse> viewApprovedRequests() {
-        List<Users> requests = userRepository.findByIsActive(true);
+        List<Users> requests = userRepository.findByIsApproved(null);
         if (requests.size() == 0) throw new NoEntriesException(CommonConstants.NO_REQUEST_TO_APPROVE);
         return requests.stream()
                 .map(user -> {
@@ -271,7 +275,7 @@ public class AdminService {
 
     public List<UserResponse> viewRequestApproved() {
         List<Users> requests = userRepository.findByIsApproved("approved");
-        if (requests.size() == 0) throw new NoEntriesException(CommonConstants.NO_REQUEST_TO_APPROVE);
+        if (requests.size() == 0) throw new NoEntriesException(CommonConstants.NO_REQUEST_HAVEBEEN_APPROVED);
         return requests.stream()
                 .map(user -> {
                     UserResponse response = new UserResponse();

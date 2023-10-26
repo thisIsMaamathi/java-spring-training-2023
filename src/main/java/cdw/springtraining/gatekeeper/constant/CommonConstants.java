@@ -54,4 +54,5 @@ public class CommonConstants {
 
     public static final String VISITOR_ALREADY_ENTERED = "The visitor had already entered the apartment";
     public static final String LOGGED_OUT = "Logged out";
+    public static final String NO_REQUEST_HAVEBEEN_APPROVED = "No requests have been approved";
 }

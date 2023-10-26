@@ -1,7 +1,11 @@
 package cdw.springtraining.gatekeeper.controller;
 
 import cdw.springtraining.gatekeeper.api.GatekeeperApi;
-import cdw.springtraining.gatekeeper.models.*;
+import cdw.springtraining.gatekeeper.models.Visitor;
+import cdw.springtraining.gatekeeper.models.ResidentGateKeeperResponse;
+import cdw.springtraining.gatekeeper.models.BlackListResponse;
+import cdw.springtraining.gatekeeper.models.ApprovedVisitorResponse;
+import cdw.springtraining.gatekeeper.models.BlackListRequest;
 import cdw.springtraining.gatekeeper.service.GateKeeperService;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
