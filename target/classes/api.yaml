@@ -1,0 +1,1371 @@
+openapi: 3.0.0
+info:
+  title: GateKeeper API
+  description: Spring Final Project
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8082
+    description: Local development server
+
+tags:
+  - name: resident
+    description: Endpoints for resident operations
+  - name: gatekeeper
+    description: Endpoints for gatekeeper operations
+  - name: admin
+    description: Endpoints for admin endpoints
+  - name: auth
+    description: Endpoints for authorization endpoints
+  - name: visitor
+    description: Endpoints for visitor endpoints
+
+
+paths:
+  /residents:
+    get:
+      summary: To display a List of all residents
+      operationId: getResidents
+      tags:
+        - admin
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ResidentAdminResponse'
+
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /user/{userId}:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+
+    put:
+      summary: Update a user by ID
+      operationId: updateUsers
+      tags:
+        - admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+      responses:
+        '200':
+          description: The updated resident
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAdminResponse'
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+    get:
+      summary: Get a user by ID
+      operationId: getUserById
+      tags:
+        - admin
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserAdminResponse'
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+
+    delete:
+      summary: Delete a user by ID
+      operationId: deleteUsers
+      tags:
+        - admin
+      responses:
+        '204':
+          description: Successful Deletion
+
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+
+
+
+  /gatekeepers:
+    get:
+      summary: To display a List of all gatekeepers
+      operationId: getGateKeeper
+      tags:
+        - admin
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GateKeeperAdminResponse'
+
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+
+
+
+  /blacklist:
+    post:
+      summary: Blacklist a person
+      operationId: blacklist
+      tags:
+        - gatekeeper
+        - resident
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BlackListRequest'
+      responses:
+        '201':
+          description: 201 CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlackListResponse'
+
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+
+
+  /gatekeeper/visitors:
+    get:
+      summary: Get a list of visitors as per given date
+      operationId: getVisitorsByDate
+      tags:
+        - gatekeeper
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+
+
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Visitor'
+
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+
+  /gatekeeper/approve/{visitorId}:
+    patch:
+      summary: allows Gatekeeper to approve a visitor
+      operationId: approveVisitor
+      tags:
+        - gatekeeper
+      parameters:
+        - name: visitorId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: pass
+          in: query
+          required: true
+          schema:
+            type: string
+
+
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovedVisitorResponse'
+
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /gatekeeper/view/{userId}:
+    get:
+      summary: To display a List of all residents
+      operationId: getUserGateKeeperView
+      tags:
+        - gatekeeper
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResidentGateKeeperResponse'
+
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+
+  /requests/approve/{requestId}:
+    patch:
+      summary: Approve and save a user to database
+      operationId: approveUser
+      tags:
+        - admin
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '201':
+          description: 201 CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /requests/reject/{requestId}:
+    patch:
+      summary: Approve and save a user to database
+      operationId: rejectUser
+      tags:
+        - admin
+      parameters:
+        - name: requestId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '201':
+          description: 201 CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+  /requests/view:
+    get:
+      summary: View all the register requests made by users
+      operationId: viewRegnRequest
+      tags:
+        - admin
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+
+
+
+  /requests/view/approved:
+    get:
+      summary: View all the register requests made by users
+      operationId: viewApprovedRequest
+      tags:
+        - admin
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /requests/view/rejected:
+    get:
+      summary: View all the register requests made by users
+      operationId: viewRejectedRequest
+      tags:
+        - admin
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /register:
+    post:
+      summary: allows a user to send registration request
+      operationId: registerUser
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+
+      responses:
+        '201':
+          description: 201 CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationResponse'
+
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+
+
+  /login:
+    post:
+      summary: Allow the user to login
+      operationId: userLogin
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggingResponse'
+
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+
+  /logoff:
+    post:
+      summary: Allow the user to log out
+      operationId: userLogout
+      tags:
+        - auth
+      parameters:
+        - name: token
+          in: header
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoggingResponse'
+
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+  /resident/schedule:
+    post:
+      summary: Allow the resident to schedule a visitors entry and generate a pass
+      operationId: scheduleVisitorEntry
+      tags:
+        - resident
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleRequest'
+      responses:
+        '201':
+          description: 201 CREATED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleResponse'
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+
+
+  /resident/cancel/{visitorId}:
+    delete:
+      summary: To remove a visitor
+      operationId: cancelVisitor
+      tags:
+        - resident
+      parameters:
+        - name: visitorId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: Successful deletion
+
+
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+
+  /visitor:
+    get:
+      summary: Visitor can view all their information
+      operationId: getVisitorDetails
+      tags:
+        - visitor
+      parameters:
+        - name: visitorPass
+          in: query
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Fetched visitor information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduleResponse'
+        '400':
+          description: 400 BAD REQUEST
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestError'
+        '401':
+          description: 401 UNAUTHORIZED
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+        '500':
+          description: 500 INTERNAL SERVER ERROR
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+        '403':
+          description: 403 FORBIDDEN
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenError'
+        '404':
+          description: 404 NOT FOUND
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFoundError'
+
+components:
+  schemas:
+
+    GateKeeperApprovalRequest:
+      type: object
+      properties:
+        pass:
+          type: string
+
+
+    #object for resident crud
+    ResidentAdminResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int32
+        residentName:
+          type: string
+        residenceId:
+          type: integer
+          format: int32
+        userName:
+          type: string
+        email:
+          type: string
+          format: email
+        dob:
+          type: string
+          format: date
+        gender:
+          type: string
+        aadhar:
+          type: integer
+          format: int64
+        phoneNumber:
+          type: integer
+          format: int64
+        isActive:
+          type: boolean
+        isApproved:
+          type: string
+        approvedBy:
+          type: string
+
+    UserAdminResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int32
+        name:
+          type: string
+        residenceId:
+          type: integer
+          format: int32
+        userName:
+          type: string
+        email:
+          type: string
+          format: email
+        dob:
+          type: string
+          format: date
+        gender:
+          type: string
+        aadhar:
+          type: integer
+          format: int64
+        phoneNumber:
+          type: integer
+          format: int64
+        userType:
+          type: string
+        isActive:
+          type: boolean
+        isApproved:
+          type: string
+        approvedBy:
+          type: string
+
+    ResidentGateKeeperResponse:
+      type: object
+      properties:
+        residentName:
+          type: string
+        residenceId:
+          type: integer
+          format: int32
+        phoneNumber:
+          type: integer
+          format: int64
+
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        residenceId:
+          type: integer
+          format: int32
+        userName:
+          type: string
+        email:
+          type: string
+          format: email
+        dob:
+          type: string
+          format: date
+        gender:
+          type: string
+        aadhar:
+          type: integer
+          format: int64
+        phoneNumber:
+          type: integer
+          format: int64
+
+    GateKeeperAdminResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int32
+        name:
+          type: string
+        userName:
+          type: string
+        email:
+          type: string
+          format: email
+        dob:
+          type: string
+          format: date
+        gender:
+          type: string
+        aadhar:
+          type: integer
+          format: int64
+        phoneNumber:
+          type: integer
+          format: int64
+        isActive:
+          type: boolean
+        isApproved:
+          type: string
+
+    UpdateGateKeeper:
+      type: object
+      properties:
+        gateKeeperName:
+          type: string
+        userName:
+          type: string
+        email:
+          type: string
+          format: email
+        dob:
+          type: string
+          format: date
+        gender:
+          type: string
+        aadhar:
+          type: integer
+          format: int64
+        phoneNumber:
+          type: integer
+          format: int64
+
+    Visitor:
+      type: object
+      properties:
+        visitorId:
+          type: integer
+          format: int32
+        visitorName:
+          type: string
+        residenceId:
+          type: integer
+          format: int32
+
+        phoneNumber:
+          type: integer
+          format: int64
+        isApproved:
+          type: string
+        hasCheckedIn:
+          type: boolean
+
+    ScheduleResponse:
+      type: object
+      properties:
+        visitorId:
+          type: integer
+          format: int32
+        name:
+          type: string
+        aadhar:
+          type: integer
+          format: int64
+        date:
+          type: string
+          format: date
+        phone:
+          type: integer
+          format: int64
+        additionalInformation:
+          type: string
+        pass:
+          type: string
+        residenceId:
+          type: integer
+          format: int32
+
+
+    RegistrationRequest:
+      type: object
+      properties:
+        userName:
+          type: string
+        aadhar:
+          type: integer
+          format: int64
+        phoneNumber:
+          type: integer
+          format: int64
+        userType:
+          type: string
+        password:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        dob:
+          type: string
+          format: date
+        gender:
+          type: string
+        residenceId:
+          type: integer  # This property is only applicable to residents
+          format: int32
+
+
+
+    LoginRequest:
+      type: object
+      properties:
+        userName:
+          type: string
+        password:
+          type: string
+
+
+    LoggingResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    UserResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int32
+        userName:
+          type: string
+        aadhar:
+          type: integer
+          format: int64
+        phoneNumber:
+          type: integer
+          format: int64
+        userType:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        dob:
+          type: string
+          format: date
+        gender:
+          type: string
+        residenceId:
+          type: integer  # This property is only applicable to residents
+          format: int32
+        isActive:
+          type: boolean
+        isApproved:
+          type: string
+
+    ScheduleRequest:
+      type: object
+      properties:
+        visitorName:
+          type: string
+        aadhar:
+          type: integer
+          format: int64
+        date:
+          type: string
+          format: date
+        phone:
+          type: integer
+          format: int64
+        additionalInformation:
+          type: string
+        residenceId:
+          type: integer
+          format: int32
+      required:
+        - name
+        - aadhar
+        - date
+        - phone
+        - residenceId
+
+    BlackListRequest:
+      type: object
+      properties:
+        aadhar:
+          type: integer
+          format: int64
+        userType:
+          type: string
+
+    BlackListResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    ApprovedVisitorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+    RegistrationResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+
+
+    #Errors
+
+    BadRequestError:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          default: 400
+        message:
+          type : string
+          default: You have made a bad request
+    UnauthorizedError:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          default: 401
+        message:
+          type : string
+          default : User not authorized
+    InternalServerError:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          default: 500
+        message:
+          type : string
+          default: Something unexpectedly occured
+    ForbiddenError:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          default: 403
+        message:
+          type : string
+          default: You are not permitted to view the requested resource
+    NotFoundError:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          default: 404
+        message:
+          type : string
+          default: Requested resource not found
+
+
+
