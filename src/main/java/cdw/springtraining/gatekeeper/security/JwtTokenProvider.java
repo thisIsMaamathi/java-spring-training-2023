@@ -1,6 +1,7 @@
 package cdw.springtraining.gatekeeper.security;
 
 
+import cdw.springtraining.gatekeeper.constant.CommonConstants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -89,13 +90,13 @@ public class JwtTokenProvider {
                     .parse(token);
             return true;
         } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
+            logger.error(CommonConstants.MAL_INFORMED_TOKEN, e.getMessage());
         } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
+            logger.error(CommonConstants.EXPIRED_JWT, e.getMessage());
         } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
+            logger.error(CommonConstants.UNSUPPORTED_JWT, e.getMessage());
         } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
+            logger.error(CommonConstants.ILLEGAL_ARGUMENT, e.getMessage());
         }
         return false;
     }

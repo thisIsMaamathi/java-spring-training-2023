@@ -50,22 +50,19 @@ public class GateKeeperService {
         Optional<Users> user = userRepository.findByUserName(username);
 
         if (user.isEmpty()) throw new UserNotFoundException(CommonConstants.USER_NOT_FOUND);
+        System.out.println(blacklistRepository.existsByAadhar(user.get().getAadhar()));
 
-        if (blacklistRepository.existsByAadhar(user.get().getAadhar()))
-            return true;
-
-        else
-            return false;
+        return blacklistRepository.existsByAadhar(user.get().getAadhar());
 
     }
 
 
     public boolean canBlacklist(String role, String userType) {
         boolean flag=true;
-        if (role.equalsIgnoreCase("resident")) {
-            return userType.equalsIgnoreCase("gatekeeper") || userType.equalsIgnoreCase("visitor");
+        if (role.equalsIgnoreCase(CommonConstants.RESIDENT)) {
+            return userType.equalsIgnoreCase(CommonConstants.GATEKEEPER) || userType.equalsIgnoreCase(CommonConstants.VISITOR);
 
-        } else return role.equalsIgnoreCase("gatekeeper") && userType.equalsIgnoreCase("visitor");
+        } else return role.equalsIgnoreCase(CommonConstants.GATEKEEPER) && userType.equalsIgnoreCase(CommonConstants.VISITOR);
 
     }
 
@@ -81,7 +78,7 @@ public class GateKeeperService {
             throw new BlackListedUserException(CommonConstants.BLACKLISTED_GATEKEEPER);
 
         List<Visitors> visitors = visitorRepository.findByDate(date);
-        if (visitors.isEmpty()) throw new NoEntriesException("No visits scheduled for this day " + date);
+        if (visitors.isEmpty()) throw new NoEntriesException(CommonConstants.NO_VISITS_SCHEDULED + date);
         return visitors.stream().map(
                 visitor -> {
                     Visitor response = new Visitor();
@@ -144,14 +141,16 @@ public class GateKeeperService {
 
         visitor.setApprovedBy(principal);
         if (pass.equals(visitor.getPass())) {
-            visitor.setIsApproved("approved");
+            visitor.setIsApproved(CommonConstants.APPROVED);
+            visitor.setApprovedBy(principal);
+            visitor.setHasCheckedIn(true);
             visitorRepository.save(visitor);
             ApprovedVisitorResponse response = new ApprovedVisitorResponse();
             response.setMessage(CommonConstants.APPROVED_VISITOR);
             return response;
 
         } else {
-            visitor.setIsApproved("rejected");
+            visitor.setIsApproved(CommonConstants.REJECTED);
             visitorRepository.save(visitor);
             ApprovedVisitorResponse response = new ApprovedVisitorResponse();
             response.setMessage(CommonConstants.REJECTED_VISITOR);

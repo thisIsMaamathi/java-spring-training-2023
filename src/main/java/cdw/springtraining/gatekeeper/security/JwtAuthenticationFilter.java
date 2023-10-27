@@ -1,5 +1,6 @@
 package cdw.springtraining.gatekeeper.security;
 
+import cdw.springtraining.gatekeeper.constant.CommonConstants;
 import cdw.springtraining.gatekeeper.repository.TokenRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
+
 
 /**
  * A custom filter for handling JWT authentication in a Spring Security application.
@@ -47,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
 
             if (!tokenRepository.existsByJwt(token))
-                throw new RuntimeException("You have logged out, please sign in again");
+                throw new RuntimeException(CommonConstants.LOGGED_OUT_USER);
             String username = jwtTokenProvider.getUsername(token);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -67,8 +69,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @return the JWT token as a string, or null if not found.
      */
     public String getTokenFromRequest(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+        String bearerToken = request.getHeader(CommonConstants.AUTHORIZATION);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(CommonConstants.BEARER)) {
             return bearerToken.substring(7, bearerToken.length());
         }
         return null;

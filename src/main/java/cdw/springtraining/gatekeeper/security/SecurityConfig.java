@@ -12,9 +12,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -47,7 +45,6 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
                 .authorizeHttpRequests((authorize) -> {
                     authorize.requestMatchers("/register").permitAll();
-                    authorize.requestMatchers("/login").permitAll();
                     authorize.requestMatchers("/requests/**").hasAuthority("admin");
                     authorize.requestMatchers("/residents").hasAuthority("admin");
                     authorize.requestMatchers("/user/**").hasAuthority("admin");
@@ -67,7 +64,6 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        //return NoOpPasswordEncoder.getInstance();
         return new BCryptPasswordEncoder();
 
     }

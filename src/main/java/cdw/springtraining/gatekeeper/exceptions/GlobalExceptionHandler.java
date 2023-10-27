@@ -1,5 +1,6 @@
 package cdw.springtraining.gatekeeper.exceptions;
 
+import cdw.springtraining.gatekeeper.constant.CommonConstants;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -7,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.nio.file.AccessDeniedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,13 @@ import java.util.List;
 public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-        ErrorResponse errorResponse = new ErrorResponse("500", "Some problem occurred");
+        ErrorResponse errorResponse = new ErrorResponse("500", CommonConstants.SOME_PROBLEM_OCCURED);
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
+        ErrorResponse errorResponse = new ErrorResponse("500", CommonConstants.SOME_PROBLEM_OCCURED);
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

@@ -2,10 +2,11 @@ package cdw.springtraining.gatekeeper.controller;
 
 
 import cdw.springtraining.gatekeeper.api.AdminApi;
-import cdw.springtraining.gatekeeper.models.UserAdminResponse;
 import cdw.springtraining.gatekeeper.models.UserResponse;
+import cdw.springtraining.gatekeeper.models.UserAdminResponse;
 import cdw.springtraining.gatekeeper.models.ResidentAdminResponse;
 import cdw.springtraining.gatekeeper.models.GateKeeperAdminResponse;
+import cdw.springtraining.gatekeeper.models.UpdateUserRequest;
 import cdw.springtraining.gatekeeper.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

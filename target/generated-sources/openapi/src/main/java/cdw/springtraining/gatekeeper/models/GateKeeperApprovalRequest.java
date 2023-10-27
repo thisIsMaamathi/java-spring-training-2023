@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 /**
  * GateKeeperApprovalRequest
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-26T16:12:55.335364+05:30[Asia/Kolkata]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2023-10-27T12:54:09.138029+05:30[Asia/Kolkata]")
 public class GateKeeperApprovalRequest   {
   @JsonProperty("pass")
   private String pass;

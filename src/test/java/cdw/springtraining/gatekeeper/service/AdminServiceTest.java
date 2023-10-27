@@ -76,7 +76,7 @@ public class AdminServiceTest {
         residentObject.add(residentObject1);
 
 
-        when(userRepository.findByUserTypeAndIsActive("resident",true)).thenReturn(residentList);
+        when(userRepository.findByUserTypeAndIsActiveAndIsApproved("resident",true,"approved")).thenReturn(residentList);
         List<ResidentAdminResponse> response = adminService.getAllResidents();
         assertEquals(residentObject, response);
 
@@ -210,7 +210,7 @@ public class AdminServiceTest {
         gateKeeperObjects.add(gateKeeperObject);
 
 
-        when(userRepository.findByUserTypeAndIsActive("gatekeeper",true)).thenReturn(gateKeepersList);
+        when(userRepository.findByUserTypeAndIsActiveAndIsApproved("gatekeeper",true,"approved")).thenReturn(gateKeepersList);
         List<GateKeeperAdminResponse> response = adminService.getAllGateKeepers();
         assertEquals(gateKeeperObjects, response);
 

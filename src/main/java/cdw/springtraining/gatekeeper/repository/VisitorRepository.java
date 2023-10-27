@@ -12,10 +12,6 @@ import java.util.Optional;
 public interface VisitorRepository extends JpaRepository<Visitors,Integer> {
     List<Visitors> findByDate(LocalDate date);
 
-    Visitors findByAadharAndDate(Long aadhar, LocalDate date);
-
-    List<Visitors> findAllByAadharAndDate(Long aadhar, LocalDate date);
-
     Visitors findByPass(String visitorPass);
 
     boolean existsByAadharAndDateAndResidenceId(Long aadhar, LocalDate date, Integer residentId);

@@ -9,7 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<Users,Integer> {
-    List<Users> findByUserTypeAndIsActive(String resident, boolean b);
 
     boolean existsByAadhar(Long aadhar);
 
@@ -20,4 +19,6 @@ public interface UserRepository extends JpaRepository<Users,Integer> {
     List<Users> findByIsActive(boolean b);
 
     List<Users> findByIsApproved(String approved);
+
+    List<Users> findByUserTypeAndIsActiveAndIsApproved(String resident, boolean b, String approved);
 }

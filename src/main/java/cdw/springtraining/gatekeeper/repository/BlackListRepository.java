@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BlackListRepository extends JpaRepository<Blacklist,Integer> {
-
     boolean existsByAadhar(Long aadhar);
 }

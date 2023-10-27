@@ -1,7 +1,7 @@
 -------------------------------------------------------------------------------
 Test set: cdw.springtraining.gatekeeper.service.GateKeeperServiceTest
 -------------------------------------------------------------------------------
-Tests run: 5, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.087 s <<< FAILURE! - in cdw.springtraining.gatekeeper.service.GateKeeperServiceTest
+Tests run: 6, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.095 s <<< FAILURE! - in cdw.springtraining.gatekeeper.service.GateKeeperServiceTest
 cdw.springtraining.gatekeeper.service.GateKeeperServiceTest.testBlackListVisitor  Time elapsed: 0.003 s  <<< ERROR!
 org.mockito.exceptions.misusing.MissingMethodInvocationException: 
 
@@ -15,7 +15,7 @@ Also, this error might show up because:
    Mocking methods declared on non-public parent classes is not supported.
 2. inside when() you don't call method on mock but on some other object.
 
-	at cdw.springtraining.gatekeeper.service.GateKeeperServiceTest.testBlackListVisitor(GateKeeperServiceTest.java:127)
+	at cdw.springtraining.gatekeeper.service.GateKeeperServiceTest.testBlackListVisitor(GateKeeperServiceTest.java:125)
 	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:578)
 	at org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:727)

@@ -1,6 +1,7 @@
 package cdw.springtraining.gatekeeper.validation;
 
 
+import cdw.springtraining.gatekeeper.constant.CommonConstants;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -21,7 +22,7 @@ import static java.lang.annotation.ElementType.PARAMETER;
 @Documented
 @Constraint(validatedBy = AadharValidator.class)
 public @interface ValidAadhar {
-    public String message() default "Enter a valid aadhar number";
+    public String message() default CommonConstants.ENTER_VALID_AADHAR;
     public Class<?>[] groups() default {};
     public Class<? extends Payload>[] payload() default {};
 }

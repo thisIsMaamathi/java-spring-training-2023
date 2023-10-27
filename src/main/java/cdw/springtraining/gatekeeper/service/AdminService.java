@@ -53,8 +53,8 @@ public class AdminService {
     @Transactional
     public UserResponse approveRequest(Integer requestId) {
         Users user = userRepository.findById(requestId).orElseThrow(() -> new UserNotFoundException(CommonConstants.APPROVE_REQUEST_NOT_FOUND));
-        if(user.getUserType().equalsIgnoreCase("admin")) throw new UserAlreadyExistsException(CommonConstants.USER_IS_ADMIN);
-        user.setIsApproved("approved");
+        if(user.getUserType().equalsIgnoreCase(CommonConstants.ADMIN)) throw new UserAlreadyExistsException(CommonConstants.USER_IS_ADMIN);
+        user.setIsApproved(CommonConstants.APPROVED);
         user.setActive(true);
         user.setApprovedBy(customUserDetailsService.getCurrentUserName());
         userRepository.save(user);
@@ -81,7 +81,7 @@ public class AdminService {
      * @return List of Resident object where each object contains information about the resident
      */
     public List<ResidentAdminResponse> getAllResidents() {
-        List<Users> residents = userRepository.findByUserTypeAndIsActive("resident", true);
+        List<Users> residents = userRepository.findByUserTypeAndIsActiveAndIsApproved(CommonConstants.RESIDENT, true,CommonConstants.APPROVED);
         if (residents.size() == 0) throw new NoEntriesException(CommonConstants.NO_ACTIVE_RESIDENTS);
         return residents.stream().map(resident -> {
             ResidentAdminResponse response = new ResidentAdminResponse();
@@ -153,6 +153,7 @@ public class AdminService {
 
     public UserAdminResponse updateUser(Integer userId, UpdateUserRequest updateUserRequest) {
         Optional<Users> userOptional = userRepository.findById(userId);
+        if(userOptional.isEmpty()) throw new UserNotFoundException(CommonConstants.USER_NOT_FOUND);
         if (!userOptional.get().isActive())
             throw new UserHasBeenRemovedException(CommonConstants.RESIDENT_WAS_DELETED);
         Users user = userOptional.get();
@@ -216,6 +217,7 @@ public class AdminService {
             response.setAadhar(user.getAadhar());
             response.setIsActive(user.isActive());
             response.setIsApproved(user.getIsApproved());
+            response.setApprovedBy(user.getApprovedBy());
             response.setUserType(user.getUserType());
             return response;
         } else throw new UserHasBeenRemovedException(CommonConstants.USER_HAD_BEEN_REMOVED);
@@ -229,7 +231,7 @@ public class AdminService {
      * @return List containing Gatekeeper objects
      */
     public List<GateKeeperAdminResponse> getAllGateKeepers() {
-        List<Users> gateKeepers = userRepository.findByUserTypeAndIsActive("gatekeeper", true);
+        List<Users> gateKeepers = userRepository.findByUserTypeAndIsActiveAndIsApproved(CommonConstants.GATEKEEPER ,true,CommonConstants.APPROVED);
         if (gateKeepers.size() == 0) throw new NoEntriesException(CommonConstants.NO_ACTIVE_GATE_KEEPERS);
         return gateKeepers.stream()
                 .map(gateKeeper -> {
@@ -250,9 +252,9 @@ public class AdminService {
 
     public UserResponse rejectUser(Integer requestId) {
             Users user = userRepository.findById(requestId).orElseThrow(() -> new UserNotFoundException(CommonConstants.APPROVE_REQUEST_NOT_FOUND));
-            if(user.getUserType().equalsIgnoreCase("admin")) throw new UserAlreadyExistsException(CommonConstants.USER_IS_ADMIN);
-            user.setIsApproved("rejected");
-            user.setActive(true);
+            if(user.getUserType().equalsIgnoreCase(CommonConstants.ADMIN)) throw new UserAlreadyExistsException(CommonConstants.USER_IS_ADMIN);
+            user.setIsApproved(CommonConstants.REJECTED);
+            user.setActive(false);
             user.setApprovedBy(customUserDetailsService.getCurrentUserName());
             userRepository.save(user);
 
@@ -274,7 +276,7 @@ public class AdminService {
     }
 
     public List<UserResponse> viewRequestApproved() {
-        List<Users> requests = userRepository.findByIsApproved("approved");
+        List<Users> requests = userRepository.findByIsApproved(CommonConstants.APPROVED);
         if (requests.size() == 0) throw new NoEntriesException(CommonConstants.NO_REQUEST_HAVEBEEN_APPROVED);
         return requests.stream()
                 .map(user -> {
@@ -296,8 +298,8 @@ public class AdminService {
     }
 
     public List<UserResponse> viewRequestRejected() {
-        List<Users> requests = userRepository.findByIsApproved("rejected");
-        if (requests.size() == 0) throw new NoEntriesException(CommonConstants.NO_REQUEST_TO_APPROVE);
+        List<Users> requests = userRepository.findByIsApproved(CommonConstants.REJECTED);
+        if (requests.size() == 0) throw new NoEntriesException(CommonConstants.NO_REJECTED_REQUESTS);
         return requests.stream()
                 .map(user -> {
                     UserResponse response = new UserResponse();

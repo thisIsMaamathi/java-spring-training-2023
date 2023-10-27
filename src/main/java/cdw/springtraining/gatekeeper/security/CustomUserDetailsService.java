@@ -1,5 +1,6 @@
 package cdw.springtraining.gatekeeper.security;
 
+import cdw.springtraining.gatekeeper.constant.CommonConstants;
 import cdw.springtraining.gatekeeper.entites.Users;
 import cdw.springtraining.gatekeeper.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         Users user = (Users) userRepository.findByUserName(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not exists by Username"));
+                .orElseThrow(() -> new UsernameNotFoundException(CommonConstants.USER_NOT_FOUND));
 
         Set<GrantedAuthority> authorities = user.getRolesList().stream()
                 .map((role) -> new SimpleGrantedAuthority(role.getRoleName()))

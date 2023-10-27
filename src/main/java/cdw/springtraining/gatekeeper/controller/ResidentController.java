@@ -30,7 +30,7 @@ public class ResidentController implements ResidentApi {
      */
     @Override
     public ResponseEntity<ScheduleResponse> scheduleVisitorEntry(@RequestBody ScheduleRequest scheduleRequest) {
-        return ResponseEntity.ok(residentService.scheduleVisit(scheduleRequest));
+        return ResponseEntity.status(200).body(residentService.scheduleVisit(scheduleRequest));
     }
 
     /**

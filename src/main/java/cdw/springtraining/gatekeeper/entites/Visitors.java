@@ -65,6 +65,7 @@ public class Visitors {
     private String pass;
 
     @Column(name = "is_approved")
+    @Pattern(regexp = "approved|rejected", message = "invalid response")
     private String isApproved;
 
     @Column(name="residence_id")
@@ -74,7 +75,6 @@ public class Visitors {
     private boolean hasCheckedIn;
 
     @Column(name="approved_by")
-    @Pattern(regexp = "approved|rejected", message = "invalid response")
     private String approvedBy;
 
     @ManyToMany(cascade={CascadeType.PERSIST,CascadeType.MERGE})

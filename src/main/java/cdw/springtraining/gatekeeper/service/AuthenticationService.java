@@ -61,13 +61,14 @@ public class AuthenticationService {
      */
     public RegistrationResponse register(RegistrationRequest request) {
 
+
         if (userRepository.existsByAadhar(request.getAadhar()))
             throw new UserAlreadyExistsException(CommonConstants.USER_ALREADY_REGISTERED);
 
-        if (request.getUserType().equalsIgnoreCase("gatekeeper") && request.getResidenceId() != 0)
+        if (request.getUserType().equalsIgnoreCase(CommonConstants.GATEKEEPER) && request.getResidenceId() != 0)
             throw new RuntimeException(CommonConstants.GATEKEPER_CANNOT_HAVE_RESIDENCE_NUMBER);
 
-        if (request.getUserType().equalsIgnoreCase("resident")) {
+        if (request.getUserType().equalsIgnoreCase(CommonConstants.RESIDENT)) {
 
             if (request.getResidenceId() == 0)
                 throw new RuntimeException(CommonConstants.RESIDENCE_NUMBER_NOT_MENTIONED);
@@ -85,7 +86,7 @@ public class AuthenticationService {
         userRepository.save(user);
 
         RegistrationResponse response = new RegistrationResponse();
-        response.setMessage("Registered successfully");
+        response.setMessage(CommonConstants.REGISTERED_SUCCESSFULLY);
         return response;
 
     }
@@ -101,6 +102,7 @@ public class AuthenticationService {
         if(user.isPresent()){
             if(user.get().getIsApproved()==null) throw new RuntimeException(CommonConstants.YET_TO_BE_APPROVED);
             if(!user.get().isActive())   throw new UserHasBeenRemovedException(CommonConstants.USER_HAD_BEEN_REMOVED);
+            if(!user.get().getIsApproved().equals(CommonConstants.APPROVED)) throw  new UserHasBeenRemovedException(CommonConstants.USER_HAD_BEEN_REJECTED+" "+user.get().getApprovedBy());
         }
         else{
             throw new UserNotFoundException(CommonConstants.USER_NOT_FOUND);

@@ -26,7 +26,7 @@ public class VisitorController implements VisitorApi {
      */
     @Override
     public ResponseEntity<ScheduleResponse> getVisitorDetails(@RequestParam String visitorPass) {
-        return ResponseEntity.ok(visitorService.getVisitorDetails(visitorPass));
+        return ResponseEntity.status(200).body(visitorService.getVisitorDetails(visitorPass));
     }
 
     }

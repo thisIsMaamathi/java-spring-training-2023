@@ -62,7 +62,7 @@ public class GateKeeperController implements GatekeeperApi {
      */
     @Override
     public ResponseEntity<ApprovedVisitorResponse> approveVisitor(@PathVariable Integer visitorId, @RequestParam String pass) {
-        return ResponseEntity.ok(gateKeeperService.approveVisitor(visitorId, pass));
+        return ResponseEntity.status(200).body(gateKeeperService.approveVisitor(visitorId, pass));
     }
 
     /**
